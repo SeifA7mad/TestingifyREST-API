@@ -2,8 +2,9 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv').config();
 const cors = require('cors');
-
 const SwaggerParser = require('@apidevtools/swagger-parser');
+
+const testapiRouter = require('./routes/testapi');
 
 const app = express();
 
@@ -21,6 +22,8 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   next();
 });
+
+app.use(testapiRouter);
 
 const serverPort = process.env.SERVER_PORT;
 
