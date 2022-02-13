@@ -12,15 +12,25 @@ app.use(bodyParser.json());
 
 app.use(cors());
 
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'OPTIONS, GET, POST, PUT, PATCH, DELETE'
+  );
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
+
 const serverPort = process.env.SERVER_PORT;
 
 app.listen(serverPort, () => {
   console.log(`SERVER IS RUNNING ON PORT ${serverPort}`);
-  SwaggerParser.dereference('data-sets/pet-store-api.json', (err, api) => {
+  SwaggerParser.dereference('data-sets/open-weathermap-api.json', (err, api) => {
       if (err) {
         return console.log('ERROR');
       }
 
-      console.log(api.paths['/pets'].post.parameters[0].schema);
+      console.log(api.paths);
   })
 });
