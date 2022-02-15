@@ -2,7 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv').config();
 const cors = require('cors');
-const SwaggerParser = require('@apidevtools/swagger-parser');
 
 const testapiRouter = require('./routes/testapi');
 
@@ -29,11 +28,11 @@ const serverPort = process.env.SERVER_PORT;
 
 app.listen(serverPort, () => {
   console.log(`SERVER IS RUNNING ON PORT ${serverPort}`);
-  SwaggerParser.dereference('data-sets/open-weathermap-api.json', (err, api) => {
-      if (err) {
-        return console.log('ERROR');
-      }
+  // SwaggerParser.dereference('data-sets/open-weathermap-api.json', (err, api) => {
+  //     if (err) {
+  //       return console.log('ERROR');
+  //     }
 
-      console.log(api.paths);
-  })
+  //     console.log(api.paths);
+  // });
 });
