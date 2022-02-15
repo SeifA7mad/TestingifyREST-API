@@ -1,1 +1,3 @@
-exports.postTestApi = (req, res, next) => {};
+exports.postTestApi = (req, res, next) => {
+    console.log('dskjd');
+};
