@@ -22,17 +22,19 @@ exports.validateAccessToApi = async (req, res, next) => {
   try {
     const oas = await SwaggerParser.bundle(req.workingFilePath);
 
-    const response = await axios.get(
-      'http://api.openweathermap.org/data/2.5/weather?q=london&appid=53f9205b25dcd994f69d550835e47081'
-    );
-    console.log(response);
-
-    console.log('ldjkls');
     //loop on each server to catch an working one
-    oas.servers.forEach((server) => {});
+    // oas.servers.forEach(async (server) => {
+    //   try {
+    //     const response = await axios(
+    //       `${server.url}weather?q=London&appid=53f9205b25dcd994f69d550835e47081`
+    //     );
+    //     console.log(response.status);
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
+    // });
     next();
   } catch (err) {
-    console.log('dlskd');
     console.log(err);
   }
 };
