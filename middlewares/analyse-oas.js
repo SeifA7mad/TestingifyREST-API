@@ -27,12 +27,14 @@ exports.validateAccessToApi = async (req, res, next) => {
     //loop on each server to catch an working one
     // oas.servers.forEach(async (server) => {
     //   try {
-    //     const response = await axios(
-    //       `${server.url}weather?q=London&appid=53f9205b25dcd994f69d550835e47081`
-    //     );
-    //     console.log(response.status);
+    //     console.log('1');
+    //     const response = await axios.head(server.url);
+    //     console.log('response');
     //   } catch (err) {
-    //     console.log(err);
+    //     console.log(err.response.status);
+    //     if (err.statusCode != '404' || err.statusCode < 500) {
+    //       req.apiServer = server.url;
+    //     }
     //   }
     // });
 
@@ -41,33 +43,19 @@ exports.validateAccessToApi = async (req, res, next) => {
 
     // loop on security schemas to validate access to the API
     for (let key in requiredSecurity) {
-      if (requiredSecurity[key].type.toString().toLowerCase() === 'apikey') {
-        if (!req.query.apikey) {
-          const error = new Error('unAuthorized, API-KEY required.');
-          error.statusCode = 401;
-          throw error;
-        }
-        securityMap.set('apikey', {
-          value: req.query.apikey,
-          name: requiredSecurity[key].name,
-          in: requiredSecurity[key].in,
-        });
-      } else if (
-        requiredSecurity[key].type.toString().toLowerCase() === 'http' &&
-        requiredSecurity[key].schema.toString().toLowerCase() === 'bearer'
-      ) {
-        if (!req.query.jwt) {
-          const error = new Error('unAuthorized, JWT token required.');
-          error.statusCode = 401;
-          throw error;
-        }
-        securityMap.set('jwt', {
-          value: req.query.jwt,
-          name: 'Authorization',
-          in: 'header',
-        });
+      if (Object.keys(req.query).length === 0) {
+        const error = new Error(
+          `unauthorized, secuirty info: ${requiredSecurity[key].type} required.`
+        );
+        error.statusCode = 401;
+        throw error;
       }
+      securityMap.set(requiredSecurity[key].name, {
+        value: req.query[requiredSecurity[key].type.toString().toLowerCase()],
+        in: requiredSecurity[key].in ? requiredSecurity[key].in : 'header',
+      });
     }
+    req.requiredSecurityInfo = securityMap;
     next();
   } catch (err) {
     if (!err.statusCode) {
