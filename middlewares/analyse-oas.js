@@ -50,9 +50,12 @@ exports.validateAccessToApi = async (req, res, next) => {
         error.statusCode = 401;
         throw error;
       }
-      securityMap.set(requiredSecurity[key].name, {
+      securityMap.set(key, {
         value: req.query[requiredSecurity[key].type.toString().toLowerCase()],
         in: requiredSecurity[key].in ? requiredSecurity[key].in : 'header',
+        name: requiredSecurity[key].name
+          ? requiredSecurity[key].name
+          : 'Authorization',
       });
     }
     req.requiredSecurityInfo = securityMap;
