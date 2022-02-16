@@ -25,6 +25,12 @@ app.use((req, res, next) => {
 
 app.use(testapiRouter);
 
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.statusCode).send({ error: err.message || 'Something broke!' });
+});
+
+
 const serverPort = process.env.SERVER_PORT;
 
 app.listen(serverPort, () => {
