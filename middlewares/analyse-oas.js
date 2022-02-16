@@ -41,7 +41,7 @@ exports.validateAccessToApi = async (req, res, next) => {
     const requiredSecurity = oas.components.securitySchemes;
     const securityMap = new Map();
 
-    // loop on security schemas to validate access to the API
+    // loop on security schemas to validate&assure access to the API
     for (let key in requiredSecurity) {
       if (Object.keys(req.query).length === 0) {
         const error = new Error(
