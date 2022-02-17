@@ -1,5 +1,44 @@
 const SwaggerParser = require('@apidevtools/swagger-parser');
 
+const defaultStyles = {
+  query: 'form',
+  cookie: 'form',
+  path: 'simple',
+  header: 'simple',
+};
+
+const mappedStylesToSplitters = {
+  matrix: ';',
+  label: '.',
+  form: '%2C',
+  simple: '%2C',
+  spaceDelimited: '%20',
+  pipeDelimited: '|',
+};
+
+const transformRoute = (route) => {
+  const transformedRoute = {
+    inputs: {
+      parameters: [],
+      requestedBody: [],
+    },
+    outputs: {},
+  };
+
+  if (route.parameters) {
+    route.parameters.foreach((param) => {
+        const paramObj = {
+          name: param.name,
+          in: param.in,
+          required: param.required,
+          style: param.style
+            ? mappedStylesToSplitters[param.style]
+            : mappedStylesToSplitters[param.in],
+        };
+    });
+  }
+};
+
 exports.transformRoutes = async (req, res, next) => {
   const routesMap = {
     get: {},
