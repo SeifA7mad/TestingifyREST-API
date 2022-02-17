@@ -12,7 +12,6 @@ exports.saveOasToFile = (req, res, next) => {
       fs.writeFileSync(dir, JSON.stringify(req.body));
       console.log('File SAVED!');
       req.workingFilePath = dir;
-      next();
     } catch (err) {
       if (!err.statusCode) {
         err.statusCode = 500;
@@ -20,8 +19,9 @@ exports.saveOasToFile = (req, res, next) => {
       next(err);
     }
   } else {
-    req.workingFilePath = req.file.path; 
+    req.workingFilePath = req.file.path;
   }
+  next();
 };
 
 exports.validateAccessToApi = async (req, res, next) => {

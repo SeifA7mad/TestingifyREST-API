@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const dotenv = require('dotenv').config();
 const cors = require('cors');
 const multer = require('multer');
+const fs = require('fs');
 
 const testapiRouter = require('./routes/testapi');
 
@@ -13,7 +14,7 @@ const fileStorage = multer.diskStorage({
     cb(null, 'data');
   },
   filename: (req, file, cb) => {
-    cb(null, `${new Data().toISOString()}-${file.originalname}`);
+    cb(null, file.originalname);
   },
 });
 
@@ -46,7 +47,9 @@ app.use(testapiRouter);
 app.use((err, req, res, next) => {
   console.error(err.stack);
   if (req.workingFilePath) {
-    console.log(req.workingFilePath);
+    fs.unlink(req.workingFilePath, (err) => {
+      err ? console.log(err) : null;
+    })
   }
     res
       .status(err.statusCode)
