@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const axios = require('axios');
 const SwaggerParser = require('@apidevtools/swagger-parser');
 
 exports.saveOasToFile = (req, res, next) => {
@@ -10,17 +9,14 @@ exports.saveOasToFile = (req, res, next) => {
 
     try {
       fs.writeFileSync(dir, JSON.stringify(req.body));
-      console.log('File SAVED!');
       req.workingFilePath = dir;
     } catch (err) {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
       next(err);
     }
   } else {
     req.workingFilePath = req.file.path;
   }
+  console.log('File SAVED!');
   next();
 };
 
@@ -65,9 +61,6 @@ exports.validateAccessToApi = async (req, res, next) => {
     req.requiredSecurityInfo = securityMap;
     next();
   } catch (err) {
-    if (!err.statusCode) {
-      err.statusCode = 500;
-    }
     next(err);
   }
 };

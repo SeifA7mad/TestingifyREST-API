@@ -30,7 +30,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
 
-app.use(multer({storage: fileStorage, fileFilter: fileFilter}).single('oasFile'));
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single('oasFile')
+);
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -49,11 +51,12 @@ app.use((err, req, res, next) => {
   if (req.workingFilePath) {
     fs.unlink(req.workingFilePath, (err) => {
       err ? console.log(err) : null;
-    })
+    });
   }
-    res
-      .status(err.statusCode)
-      .send({ error: err.message || 'Something broke!' });
+  if (!err.statusCode) {
+    err.statusCode = 500;
+  }
+  res.status(err.statusCode).send({ error: err.message || 'Something broke!' });
 });
 
 const serverPort = process.env.SERVER_PORT;

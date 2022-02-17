@@ -2,12 +2,16 @@ const router = require('express').Router();
 
 const testapiController = require('../controllers/testapi');
 
-const analyseOas = require('../middlewares/analyse-oas');
+const validateSaveOas = require('../middlewares/validate-save-oas');
+
+const testingMiddlewares = [
+  validateSaveOas.saveOasToFile,
+  validateSaveOas.validateAccessToApi,
+];
 
 router.post(
   '/testapi',
-  analyseOas.saveOasToFile,
-  analyseOas.validateAccessToApi,
+  testingMiddlewares,
   testapiController.postTestApi
 );
 
