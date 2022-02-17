@@ -7,13 +7,17 @@ const defaultStyles = {
   header: 'simple',
 };
 
-const mappedStylesToSplitters = {
-  matrix: ';',
-  label: '.',
-  form: '%2C',
-  simple: '%2C',
-  spaceDelimited: '%20',
-  pipeDelimited: '|',
+const stylesTemplate = {
+  path: {
+    simple: ['{p}', '{p*}'],
+    label: ['{.p}', '{.p*}'],
+    matrix: ['{;p}', '{;p*}'],
+  },
+  query: {
+    form: ['p', 'p*'],
+    spaceDelimited: ['%20', 'p*'],
+    pipeDelimited: ['|', 'p*'],
+  },
 };
 
 const transformRoute = (route) => {
@@ -27,14 +31,14 @@ const transformRoute = (route) => {
 
   if (route.parameters) {
     route.parameters.foreach((param) => {
-        const paramObj = {
-          name: param.name,
-          in: param.in,
-          required: param.required,
-          style: param.style
-            ? mappedStylesToSplitters[param.style]
-            : mappedStylesToSplitters[param.in],
-        };
+      const paramObj = {
+        name: param.name,
+        in: param.in,
+        required: param.required,
+        style: param.style
+          ? mappedStylesToSplitters[param.style]
+          : mappedStylesToSplitters[defaultStyles[param.in]],
+      };
     });
   }
 };
