@@ -4,19 +4,23 @@ const axios = require('axios');
 const SwaggerParser = require('@apidevtools/swagger-parser');
 
 exports.saveOasToFile = (req, res, next) => {
-  const fileName = `${req.body.info.title}`.trim().split(' ').join('');
-  const dir = path.join(process.cwd(), `/data/${fileName}.json`);
+  if (!req.file) {
+    const fileName = `${req.body.info.title}`.trim().split(' ').join('');
+    const dir = path.join(process.cwd(), `/data/${fileName}.json`);
 
-  try {
-    fs.writeFileSync(dir, JSON.stringify(req.body));
-    console.log('File SAVED!');
-    req.workingFilePath = dir;
-    next();
-  } catch (err) {
-    if (!err.statusCode) {
-      err.statusCode = 500;
+    try {
+      fs.writeFileSync(dir, JSON.stringify(req.body));
+      console.log('File SAVED!');
+      req.workingFilePath = dir;
+      next();
+    } catch (err) {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
     }
-    next(err);
+  } else {
+    req.workingFilePath = req.file.path; 
   }
 };
 
