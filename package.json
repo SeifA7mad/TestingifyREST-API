@@ -17,7 +17,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
     "express": "^4.17.2",
-    "multer": "^1.4.4"
+    "multer": "^1.4.4",
+    "uri-template": "^2.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.15"
