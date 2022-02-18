@@ -30,16 +30,23 @@ const transformRoute = (route) => {
   };
 
   if (route.parameters) {
-    route.parameters.foreach((param) => {
+    route.parameters.forEach((param) => {
       const paramObj = {
         name: param.name,
         in: param.in,
-        required: param.required,
+        required: param.required ? param.required : false,
         style: param.style
-          ? mappedStylesToSplitters[param.style]
-          : mappedStylesToSplitters[defaultStyles[param.in]],
+          ? stylesTemplate[param.in][param.style]
+          : stylesTemplate[param.in][defaultStyles[param.in]],
+        explode: param.explode
+          ? param.explode
+          : param.style === 'form'
+          ? true
+          : false,
       };
+      transformedRoute['inputs'].parameters.push(paramObj);
     });
+    console.log(transformedRoute['inputs'].parameters);
   }
 };
 
@@ -61,9 +68,9 @@ exports.transformRoutes = async (req, res, next) => {
     for (let path in oasPaths) {
       for (let op in oasPaths[path]) {
         // routesMap[op.toString().toLowerCase()][path] = { ex: 'ex' };
+        transformRoute(oasPaths[path][op]);
       }
     }
-    console.log(routesMap);
     next();
   } catch (err) {
     next(err);
