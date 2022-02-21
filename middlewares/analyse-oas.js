@@ -24,14 +24,14 @@ const transformRoute = (route) => {
   const transformedRoute = {
     inputs: {
       parameters: [],
-      requestedBody: [],
+      requestBody: [],
     },
     outputs: {},
   };
 
-  let explode = null;
-
+  // loop on parameters obj (if exist)
   if (route.parameters) {
+    let explode = null;
     route.parameters.forEach((param) => {
       // no explode -> default = false (exception style 'form' default = true)
       explode = param.explode
@@ -47,10 +47,23 @@ const transformRoute = (route) => {
         style: param.style
           ? stylesTemplate[param.in][param.style][explode]
           : stylesTemplate[param.in][defaultStyles[param.in]][explode],
+        jsonSchema: param.schema,
+        value: null,
       };
       transformedRoute['inputs'].parameters.push(paramObj);
     });
     // console.log(transformedRoute['inputs'].parameters);
+  }
+
+  if (route.requestBody) {
+    const bodyContent = route.requestBody.content['application/json'];
+
+    const bodyObj = {
+      jsonSchema: bodyContent.schema,
+      required: route.requestBody.required ? route.requestBody.required : false,
+      value: null,
+    };
+    transformedRoute['inputs'].requestBody.push(bodyObj);
   }
   return transformedRoute;
 };
@@ -77,6 +90,8 @@ exports.transformRoutes = async (req, res, next) => {
         );
       }
     }
+    // .post['/meals'].inputs.requestBody[0].content
+    // .get['/meals'].inputs.parameters[0].jsonSchema
     console.log(routesMap);
     next();
   } catch (err) {
