@@ -29,25 +29,30 @@ const transformRoute = (route) => {
     outputs: {},
   };
 
+  let explode = null;
+
   if (route.parameters) {
     route.parameters.forEach((param) => {
+      // no explode -> default = false (exception style 'form' default = true)
+      explode = param.explode
+        ? +param.explode
+        : !param.style || param.style === 'form'
+        ? +true
+        : +false;
+
       const paramObj = {
         name: param.name,
         in: param.in,
         required: param.required ? param.required : false,
         style: param.style
-          ? stylesTemplate[param.in][param.style]
-          : stylesTemplate[param.in][defaultStyles[param.in]],
-        explode: param.explode
-          ? param.explode
-          : param.style === 'form'
-          ? true
-          : false,
+          ? stylesTemplate[param.in][param.style][explode]
+          : stylesTemplate[param.in][defaultStyles[param.in]][explode],
       };
       transformedRoute['inputs'].parameters.push(paramObj);
     });
-    console.log(transformedRoute['inputs'].parameters);
+    // console.log(transformedRoute['inputs'].parameters);
   }
+  return transformedRoute;
 };
 
 exports.transformRoutes = async (req, res, next) => {
@@ -67,10 +72,12 @@ exports.transformRoutes = async (req, res, next) => {
     // if big --> split to chunks and work parallel on each chunck
     for (let path in oasPaths) {
       for (let op in oasPaths[path]) {
-        // routesMap[op.toString().toLowerCase()][path] = { ex: 'ex' };
-        transformRoute(oasPaths[path][op]);
+        routesMap[op.toString().toLowerCase()][path] = transformRoute(
+          oasPaths[path][op]
+        );
       }
     }
+    console.log(routesMap);
     next();
   } catch (err) {
     next(err);
