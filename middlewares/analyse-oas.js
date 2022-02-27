@@ -20,6 +20,8 @@ const stylesTemplate = {
   },
 };
 
+const dictionary = {};
+
 const generateValue = (typeSchema) => {
   if (typeSchema.example || typeSchema.default || typeSchema.enum) {
     const values = [typeSchema.example, typeSchema.default, typeSchema.enum[0]];
@@ -44,7 +46,7 @@ const transformRoute = (route) => {
       parameters: [],
       requestBody: [],
     },
-    outputs: {},
+    outputs: [],
   };
 
   // loop on parameters obj (if exist)
@@ -65,11 +67,14 @@ const transformRoute = (route) => {
         style: param.style
           ? stylesTemplate[param.in][param.style][explode]
           : stylesTemplate[param.in][defaultStyles[param.in]][explode],
-        jsonSchema: param.schema,
-        value: param.example
-          ? param.example
-          : generateValue(param.schema),
       };
+
+      if (!dictionary[param.name]) {
+        dictionary[param.name] = {
+          jsonSchema: param.schema,
+          value: param.example ? param.example : generateValue(param.schema),
+        };
+      }
       transformedRoute['inputs'].parameters.push(paramObj);
     });
     // console.log(transformedRoute['inputs'].parameters);
@@ -77,13 +82,21 @@ const transformRoute = (route) => {
 
   if (route.requestBody) {
     const bodyContent = route.requestBody.content['application/json'];
-
+    // concern: if no examples -> loop on the properties + add it it in the dictionry if no already added
     const bodyObj = {
       jsonSchema: bodyContent.schema,
       required: route.requestBody.required ? route.requestBody.required : false,
+      examples: route.requestBody.examples ? route.requestBody.examples : null
     };
     transformedRoute['inputs'].requestBody.push(bodyObj);
   }
+
+  if (route.responses) {
+    for (let res in route.responses) {
+      transformedRoute.outputs.push(+res);
+    }
+  } 
+
   return transformedRoute;
 };
 
@@ -117,7 +130,9 @@ exports.transformRoutes = async (req, res, next) => {
     // .get['/meals'].inputs.parameters[0].jsonSchema
     //.get['/maps/api/elevation/json'].inputs.parameters
     // ['/meals/{id}']['delete'].inputs.parameters
-    console.log(routesMap);
+    // console.log(routesMap['/meals']['get'].inputs.parameters);
+    // routesMap['/meals']['get'].outputs
+    console.log(dictionary);
     next();
   } catch (err) {
     next(err);
