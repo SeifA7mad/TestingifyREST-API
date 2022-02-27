@@ -20,6 +20,24 @@ const stylesTemplate = {
   },
 };
 
+const generateValue = (typeSchema) => {
+  if (typeSchema.example || typeSchema.default || typeSchema.enum) {
+    const values = [typeSchema.example, typeSchema.default, typeSchema.enum[0]];
+    return values.find((value) => value !== undefined);
+  }
+
+  if (typeSchema.type === 'number' || typeSchema.type === 'integer') {
+    return typeSchema.maximum
+      ? Math.floor(
+          Math.random() * (typeSchema.maximum - typeSchema.minimum) +
+            typeSchema.minimum
+        )
+      : 0;
+  }
+
+  return '';
+};
+
 const transformRoute = (route) => {
   const transformedRoute = {
     inputs: {
@@ -48,7 +66,9 @@ const transformRoute = (route) => {
           ? stylesTemplate[param.in][param.style][explode]
           : stylesTemplate[param.in][defaultStyles[param.in]][explode],
         jsonSchema: param.schema,
-        value: null,
+        value: param.example
+          ? param.example
+          : generateValue(param.schema),
       };
       transformedRoute['inputs'].parameters.push(paramObj);
     });
@@ -61,7 +81,6 @@ const transformRoute = (route) => {
     const bodyObj = {
       jsonSchema: bodyContent.schema,
       required: route.requestBody.required ? route.requestBody.required : false,
-      value: null,
     };
     transformedRoute['inputs'].requestBody.push(bodyObj);
   }
@@ -69,13 +88,15 @@ const transformRoute = (route) => {
 };
 
 exports.transformRoutes = async (req, res, next) => {
-  const routesMap = {
-    get: {},
-    post: {},
-    put: {},
-    patch: {},
-    delete: {},
-  };
+  // const routesMap = {
+  //   get: {},
+  //   post: {},
+  //   put: {},
+  //   patch: {},
+  //   delete: {},
+  // };
+
+  const routesMap = {};
 
   try {
     const oas = await SwaggerParser.dereference(req.workingFilePath);
@@ -84,14 +105,18 @@ exports.transformRoutes = async (req, res, next) => {
     // later: work on file streams (chunks) instead of looping on whole file
     // if big --> split to chunks and work parallel on each chunck
     for (let path in oasPaths) {
+      routesMap[path] = {};
       for (let op in oasPaths[path]) {
-        routesMap[op.toString().toLowerCase()][path] = transformRoute(
-          oasPaths[path][op]
-        );
+        //  routesMap[op.toString().toLowerCase()][path] = transformRoute(
+        //    oasPaths[path][op]
+        //  );
+        routesMap[path][op] = transformRoute(oasPaths[path][op]);
       }
     }
     // .post['/meals'].inputs.requestBody[0].content
     // .get['/meals'].inputs.parameters[0].jsonSchema
+    //.get['/maps/api/elevation/json'].inputs.parameters
+    // ['/meals/{id}']['delete'].inputs.parameters
     console.log(routesMap);
     next();
   } catch (err) {
