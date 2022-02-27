@@ -6,10 +6,6 @@ exports.saveOasToFile = (req, res, next) => {
   if (!req.file) {
     const fileName = `${req.body.info.title}`.trim().split(' ').join('');
 
-    if (!fs.existsSync('./data')) {
-      fs.mkdirSync('./data');
-    }
-
     const dir = path.join(process.cwd(), `/data/${fileName}.json`);
     try {
       fs.writeFileSync(dir, JSON.stringify(req.body));

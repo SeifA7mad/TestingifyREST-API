@@ -9,6 +9,13 @@ const testapiRouter = require('./routes/testapi');
 
 const app = express();
 
+app.use((req, res, next) => {
+  if (!fs.existsSync('./data')) {
+    fs.mkdirSync('./data');
+  }
+  next();
+});
+
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'data');
