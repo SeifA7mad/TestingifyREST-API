@@ -40,7 +40,7 @@ const generateValue = (typeSchema) => {
   return '';
 };
 
-const transformRoute = (route) => {
+const transformRoute = (route, pathName) => {
   const transformedRoute = {
     inputs: {
       parameters: [],
@@ -59,9 +59,16 @@ const transformRoute = (route) => {
         : !param.style || param.style === 'form'
         ? +true
         : +false;
+      
+      const paramName =
+        param.name !== 'id'
+          ? param.name
+          : param.operationId
+          ? `${param.operationId}${param.name}`
+          : `${pathName}${param.name}`;
 
       const paramObj = {
-        name: param.name,
+        name: paramName,
         in: param.in,
         required: param.required ? param.required : false,
         style: param.style
@@ -69,9 +76,9 @@ const transformRoute = (route) => {
           : stylesTemplate[param.in][defaultStyles[param.in]][explode],
       };
 
-      if (!dictionary[param.name]) {
-        dictionary[param.name] = {
-          jsonSchema: param.schema,
+      if (!dictionary[paramName]) {
+        dictionary[paramName] = {
+          schema: param.schema,
           value: param.example ? param.example : generateValue(param.schema),
         };
       }
@@ -82,9 +89,9 @@ const transformRoute = (route) => {
 
   if (route.requestBody) {
     const bodyContent = route.requestBody.content['application/json'];
-    // concern: if no examples -> loop on the properties + add it it in the dictionry if no already added
+    // concern: if no examples -> loop on the properties + add it it in the dictionry if not already added
     const bodyObj = {
-      jsonSchema: bodyContent.schema,
+      schema: bodyContent.schema,
       required: route.requestBody.required ? route.requestBody.required : false,
       examples: route.requestBody.examples ? route.requestBody.examples : null
     };
@@ -123,7 +130,7 @@ exports.transformRoutes = async (req, res, next) => {
         //  routesMap[op.toString().toLowerCase()][path] = transformRoute(
         //    oasPaths[path][op]
         //  );
-        routesMap[path][op] = transformRoute(oasPaths[path][op]);
+        routesMap[path][op] = transformRoute(oasPaths[path][op], path.split('/')[1].toLocaleLowerCase());
       }
     }
     // .post['/meals'].inputs.requestBody[0].content
@@ -132,6 +139,7 @@ exports.transformRoutes = async (req, res, next) => {
     // ['/meals/{id}']['delete'].inputs.parameters
     // console.log(routesMap['/meals']['get'].inputs.parameters);
     // routesMap['/meals']['get'].outputs
+    // routesMap['/meals']['post'].inputs.requestBody
     console.log(dictionary);
     next();
   } catch (err) {

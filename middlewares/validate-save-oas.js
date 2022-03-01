@@ -4,9 +4,7 @@ const SwaggerParser = require('@apidevtools/swagger-parser');
 
 exports.saveOasToFile = (req, res, next) => {
   if (!req.file) {
-    const fileName = `${req.body.info.title}`.trim().split(' ').join('');
-
-    const dir = path.join(process.cwd(), `/data/${fileName}.json`);
+    const dir = path.join(process.cwd(), `/data/${req.file.originalname}`);
     try {
       fs.writeFileSync(dir, JSON.stringify(req.body));
       req.workingFilePath = dir;
@@ -58,6 +56,8 @@ exports.validateAccessToApi = async (req, res, next) => {
           : 'Authorization',
       });
     }
+
+    // console.log(securityMap);
     req.requiredSecurityInfo = securityMap;
     next();
   } catch (err) {
