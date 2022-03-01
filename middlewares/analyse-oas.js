@@ -99,6 +99,7 @@ const transformRoute = (route, pathName) => {
       examples: route.requestBody.examples ? route.requestBody.examples : null,
     };
 
+    // loop: on body request properties 
     for (let prop in bodyContent.schema.properties) {
       const propName =
         prop !== 'id'
