@@ -18,13 +18,16 @@ const stylesTemplate = {
     spaceDelimited: ['%20', 'p*'],
     pipeDelimited: ['|', 'p*'],
   },
+  header: {
+    simple: ['{p}', '{p*}'],
+  },
 };
 
 const dictionary = {};
 
 const generateValue = (typeSchema) => {
   if (typeSchema.example || typeSchema.default || typeSchema.enum) {
-    const values = [typeSchema.example, typeSchema.default, typeSchema.enum[0]];
+    const values = [typeSchema.example, typeSchema.default, typeSchema.enum ? typeSchema.enum[0] : undefined];
     return values.find((value) => value !== undefined);
   }
 
@@ -59,12 +62,12 @@ const transformRoute = (route, pathName) => {
         : !param.style || param.style === 'form'
         ? +true
         : +false;
-      
+
       const paramName =
         param.name !== 'id'
           ? param.name
-          : param.operationId
-          ? `${param.operationId}${param.name}`
+          : route.operationId
+          ? `${route.operationId}${param.name}`
           : `${pathName}${param.name}`;
 
       const paramObj = {
@@ -93,8 +96,24 @@ const transformRoute = (route, pathName) => {
     const bodyObj = {
       schema: bodyContent.schema,
       required: route.requestBody.required ? route.requestBody.required : false,
-      examples: route.requestBody.examples ? route.requestBody.examples : null
+      examples: route.requestBody.examples ? route.requestBody.examples : null,
     };
+
+    for (let prop in bodyContent.schema.properties) {
+      const propName =
+        prop !== 'id'
+          ? prop
+          : route.operationId
+          ? `${route.operationId}${prop}`
+          : `${pathName}${prop}`;
+
+      if (!dictionary[propName]) {
+        dictionary[propName] = {
+          schema: bodyContent.schema.properties[prop],
+          value: generateValue(bodyContent.schema.properties[prop]),
+        };
+      }
+    }
     transformedRoute['inputs'].requestBody.push(bodyObj);
   }
 
@@ -102,7 +121,7 @@ const transformRoute = (route, pathName) => {
     for (let res in route.responses) {
       transformedRoute.outputs.push(+res);
     }
-  } 
+  }
 
   return transformedRoute;
 };
@@ -130,7 +149,10 @@ exports.transformRoutes = async (req, res, next) => {
         //  routesMap[op.toString().toLowerCase()][path] = transformRoute(
         //    oasPaths[path][op]
         //  );
-        routesMap[path][op] = transformRoute(oasPaths[path][op], path.split('/')[1].toLocaleLowerCase());
+        routesMap[path][op] = transformRoute(
+          oasPaths[path][op],
+          path.split('/')[1].toLocaleLowerCase()
+        );
       }
     }
     // .post['/meals'].inputs.requestBody[0].content
