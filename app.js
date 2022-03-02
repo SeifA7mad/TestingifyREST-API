@@ -9,12 +9,11 @@ const testapiRouter = require('./routes/testapi');
 
 const app = express();
 
-global.dictionary = {};
-
 app.use((req, res, next) => {
   if (!fs.existsSync('./data')) {
     fs.mkdirSync('./data');
   }
+  global.dictionary = {};
   next();
 });
 
@@ -60,11 +59,11 @@ app.use(testapiRouter);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  // if (req.workingFilePath) {
-  //   fs.unlink(req.workingFilePath, (err) => {
-  //     err ? console.log(err) : null;
-  //   });
-  // }
+  if (req.workingFilePath) {
+    fs.unlink(req.workingFilePath, (err) => {
+      err ? console.log(err) : null;
+    });
+  }
   if (!err.statusCode) {
     err.statusCode = 500;
   }

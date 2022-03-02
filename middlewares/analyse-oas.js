@@ -131,13 +131,13 @@ exports.transformRoutes = async (req, res, next) => {
     for (let path in oasPaths) {
       routesMap[path] = {};
       for (let op in oasPaths[path]) {
-        //  routesMap[op.toString().toLowerCase()][path] = transformRoute(
-        //    oasPaths[path][op]
-        //  );
-        routesMap[path][op] = transformRoute(
-          oasPaths[path][op],
-          path.split('/')[1].toLocaleLowerCase().slice(0, -1)
-        );
+
+        let pathModified = path.split('/')[1].toLocaleLowerCase();
+        pathModified.charAt(pathModified.length - 1) === 's'
+          ? (pathModified = pathModified.slice(0, -1))
+          : null;
+
+        routesMap[path][op] = transformRoute(oasPaths[path][op], pathModified);
       }
     }
     // .post['/meals'].inputs.requestBody[0].content
@@ -147,10 +147,10 @@ exports.transformRoutes = async (req, res, next) => {
     // console.log(routesMap['/meals']['get'].inputs.parameters);
     // routesMap['/meals']['get'].outputs
     // routesMap['/meals']['post'].inputs.requestBody
-    console.log(dictionary);
+    console.log(routesMap['/meals'].get.inputs);
 
     req.routes = routesMap;
-    req.dictionary = dictionary;
+
     next();
   } catch (err) {
     next(err);

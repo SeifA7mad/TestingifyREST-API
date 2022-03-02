@@ -1,4 +1,4 @@
-exports.generateValue = (typeSchema, namePrefix = '') => {
+const generateValue = (typeSchema, namePrefix = '') => {
   if (
     typeSchema.example ||
     typeSchema.default ||
@@ -46,4 +46,9 @@ exports.generateValue = (typeSchema, namePrefix = '') => {
     return obj;
   }
   return '';
+};
+
+
+module.exports = {
+  generateValue,
 };
