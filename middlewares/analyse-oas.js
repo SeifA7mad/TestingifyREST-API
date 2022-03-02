@@ -146,7 +146,7 @@ const transformRoute = (route, pathName) => {
             route.operationId ? route.operationId : pathName
           ),
     };
-    
+
     transformedRoute['inputs'].requestBody.push(bodyObj);
   }
 
@@ -197,6 +197,9 @@ exports.transformRoutes = async (req, res, next) => {
     // routesMap['/meals']['get'].outputs
     // routesMap['/meals']['post'].inputs.requestBody
     console.log(dictionary);
+
+    req.routes = routesMap;
+    req.dictionary = dictionary;
     next();
   } catch (err) {
     next(err);
