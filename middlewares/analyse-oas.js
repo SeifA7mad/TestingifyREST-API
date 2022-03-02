@@ -139,35 +139,14 @@ const transformRoute = (route, pathName) => {
     const bodyObj = {
       schema: bodyContent.schema,
       required: route.requestBody.required ? route.requestBody.required : false,
-      examples: route.requestBody.examples ? route.requestBody.examples : null,
+      examples: route.requestBody.examples
+        ? route.requestBody.examples
+        : generateValue(
+            bodyContent.schema,
+            route.operationId ? route.operationId : pathName
+          ),
     };
-
-    generateValue(
-      bodyContent.schema,
-      route.operationId ? route.operationId : pathName
-    );
-
-    // loop: on body request properties
-    // for (let prop in bodyContent.schema.properties) {
-    //   const propName =
-    //     prop !== 'id'
-    //       ? prop
-    //       : route.operationId
-    //       ? `${route.operationId}${prop}`
-    //       : `${pathName}${prop}`;
-
-    //   if (!dictionary[propName]) {
-    //     dictionary[propName] = {
-    //       schema: bodyContent.schema.properties[prop],
-    //       value: bodyContent.schema.properties[prop].example
-    //         ? bodyContent.schema.properties[prop].example
-    //         : generateValue(
-    //             bodyContent.schema.properties[prop],
-    //             route.operationId ? route.operationId : pathName
-    //           ),
-    //     };
-    //   }
-    // }
+    
     transformedRoute['inputs'].requestBody.push(bodyObj);
   }
 
