@@ -25,9 +25,21 @@ const stylesTemplate = {
 
 const dictionary = {};
 
-const generateValue = (typeSchema) => {
-  if (typeSchema.example || typeSchema.default || typeSchema.enum) {
-    const values = [typeSchema.example, typeSchema.default, typeSchema.enum ? typeSchema.enum[0] : undefined];
+const generateValue = (typeSchema, namePrefix = '') => {
+  if (
+    typeSchema.example ||
+    typeSchema.default ||
+    typeSchema.enum ||
+    typeSchema.items
+  ) {
+    const values = [
+      typeSchema.example,
+      typeSchema.default,
+      typeSchema.enum ? typeSchema.enum[0] : undefined,
+      typeSchema.items
+        ? [generateValue(typeSchema.items, namePrefix)]
+        : undefined,
+    ];
     return values.find((value) => value !== undefined);
   }
 
@@ -40,6 +52,26 @@ const generateValue = (typeSchema) => {
       : 0;
   }
 
+  if (typeSchema.type === 'object') {
+    const obj = {};
+    let propName;
+
+    for (let prop in typeSchema.properties) {
+      propName = prop !== 'id' ? prop : `${namePrefix}${prop}`;
+
+      if (!dictionary[propName]) {
+        dictionary[propName] = {
+          schema: typeSchema.properties[prop],
+          value: typeSchema.properties[prop].example
+            ? typeSchema.properties[prop].example
+            : generateValue(typeSchema.properties[prop], namePrefix),
+        };
+      }
+
+      obj[propName] = dictionary[propName].value;
+    }
+    return obj;
+  }
   return '';
 };
 
@@ -49,7 +81,7 @@ const transformRoute = (route, pathName) => {
       parameters: [],
       requestBody: [],
     },
-    outputs: [],
+    outputs: {},
   };
 
   // input: parameters
@@ -64,6 +96,9 @@ const transformRoute = (route, pathName) => {
         ? +true
         : +false;
 
+      // check to see if param name is not specified exactly ex: id
+      // if not use the original name
+      // if it use the operationId + param name if exixst <--> if not exist use the path name + param name
       const paramName =
         param.name !== 'id'
           ? param.name
@@ -80,10 +115,16 @@ const transformRoute = (route, pathName) => {
           : stylesTemplate[param.in][defaultStyles[param.in]][explode],
       };
 
+      // add paramter (schema, value) to the dictionry if not already exist
       if (!dictionary[paramName]) {
         dictionary[paramName] = {
           schema: param.schema,
-          value: param.example ? param.example : generateValue(param.schema),
+          value: param.example
+            ? param.example
+            : generateValue(
+                param.schema,
+                route.operationId ? route.operationId : pathName
+              ),
         };
       }
       transformedRoute['inputs'].parameters.push(paramObj);
@@ -94,36 +135,46 @@ const transformRoute = (route, pathName) => {
   // input: body content
   if (route.requestBody) {
     const bodyContent = route.requestBody.content['application/json'];
-    // concern: if no examples -> loop on the properties + add it it in the dictionry if not already added
+
     const bodyObj = {
       schema: bodyContent.schema,
       required: route.requestBody.required ? route.requestBody.required : false,
       examples: route.requestBody.examples ? route.requestBody.examples : null,
     };
 
-    // loop: on body request properties 
-    for (let prop in bodyContent.schema.properties) {
-      const propName =
-        prop !== 'id'
-          ? prop
-          : route.operationId
-          ? `${route.operationId}${prop}`
-          : `${pathName}${prop}`;
+    generateValue(
+      bodyContent.schema,
+      route.operationId ? route.operationId : pathName
+    );
 
-      if (!dictionary[propName]) {
-        dictionary[propName] = {
-          schema: bodyContent.schema.properties[prop],
-          value: generateValue(bodyContent.schema.properties[prop]),
-        };
-      }
-    }
+    // loop: on body request properties
+    // for (let prop in bodyContent.schema.properties) {
+    //   const propName =
+    //     prop !== 'id'
+    //       ? prop
+    //       : route.operationId
+    //       ? `${route.operationId}${prop}`
+    //       : `${pathName}${prop}`;
+
+    //   if (!dictionary[propName]) {
+    //     dictionary[propName] = {
+    //       schema: bodyContent.schema.properties[prop],
+    //       value: bodyContent.schema.properties[prop].example
+    //         ? bodyContent.schema.properties[prop].example
+    //         : generateValue(
+    //             bodyContent.schema.properties[prop],
+    //             route.operationId ? route.operationId : pathName
+    //           ),
+    //     };
+    //   }
+    // }
     transformedRoute['inputs'].requestBody.push(bodyObj);
   }
 
   // output: responses
   if (route.responses) {
     for (let res in route.responses) {
-      transformedRoute.outputs.push(+res);
+      transformedRoute.outputs[res] = route.responses[res];
     }
   }
 
