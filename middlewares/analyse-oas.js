@@ -52,6 +52,7 @@ const transformRoute = (route, pathName) => {
     outputs: [],
   };
 
+  // input: parameters
   // loop on parameters obj (if exist)
   if (route.parameters) {
     let explode = null;
@@ -90,6 +91,7 @@ const transformRoute = (route, pathName) => {
     // console.log(transformedRoute['inputs'].parameters);
   }
 
+  // input: body content
   if (route.requestBody) {
     const bodyContent = route.requestBody.content['application/json'];
     // concern: if no examples -> loop on the properties + add it it in the dictionry if not already added
@@ -118,6 +120,7 @@ const transformRoute = (route, pathName) => {
     transformedRoute['inputs'].requestBody.push(bodyObj);
   }
 
+  // output: responses
   if (route.responses) {
     for (let res in route.responses) {
       transformedRoute.outputs.push(+res);

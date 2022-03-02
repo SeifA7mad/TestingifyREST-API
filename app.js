@@ -28,7 +28,7 @@ const fileStorage = multer.diskStorage({
 const fileFilter = (req, file, cb) => {
   if (
     file.mimetype === 'application/json' ||
-    file.mimetype === 'application/x-yaml'
+    file.mimetype === 'text/x-yaml'
   ) {
     cb(null, true);
   } else {
