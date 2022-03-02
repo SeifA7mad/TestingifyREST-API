@@ -59,6 +59,7 @@ exports.validateAccessToApi = async (req, res, next) => {
 
     // console.log(securityMap);
     req.requiredSecurityInfo = securityMap;
+    req.server = oas.servers[0].url; 
     next();
   } catch (err) {
     next(err);

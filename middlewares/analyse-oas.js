@@ -1,4 +1,5 @@
 const SwaggerParser = require('@apidevtools/swagger-parser');
+const { generateValue } = require('../helpers/generateValues');
 
 const defaultStyles = {
   query: 'form',
@@ -21,58 +22,6 @@ const stylesTemplate = {
   header: {
     simple: ['{p}', '{p*}'],
   },
-};
-
-const dictionary = {};
-
-const generateValue = (typeSchema, namePrefix = '') => {
-  if (
-    typeSchema.example ||
-    typeSchema.default ||
-    typeSchema.enum ||
-    typeSchema.items
-  ) {
-    const values = [
-      typeSchema.example,
-      typeSchema.default,
-      typeSchema.enum ? typeSchema.enum[0] : undefined,
-      typeSchema.items
-        ? [generateValue(typeSchema.items, namePrefix)]
-        : undefined,
-    ];
-    return values.find((value) => value !== undefined);
-  }
-
-  if (typeSchema.type === 'number' || typeSchema.type === 'integer') {
-    return typeSchema.maximum
-      ? Math.floor(
-          Math.random() * (typeSchema.maximum - typeSchema.minimum) +
-            typeSchema.minimum
-        )
-      : 0;
-  }
-
-  if (typeSchema.type === 'object') {
-    const obj = {};
-    let propName;
-
-    for (let prop in typeSchema.properties) {
-      propName = prop !== 'id' ? prop : `${namePrefix}${prop}`;
-
-      if (!dictionary[propName]) {
-        dictionary[propName] = {
-          schema: typeSchema.properties[prop],
-          value: typeSchema.properties[prop].example
-            ? typeSchema.properties[prop].example
-            : generateValue(typeSchema.properties[prop], namePrefix),
-        };
-      }
-
-      obj[propName] = dictionary[propName].value;
-    }
-    return obj;
-  }
-  return '';
 };
 
 const transformRoute = (route, pathName) => {
@@ -103,11 +52,12 @@ const transformRoute = (route, pathName) => {
         param.name !== 'id'
           ? param.name
           : route.operationId
-          ? `${route.operationId}${param.name}`
-          : `${pathName}${param.name}`;
+          ? `${route.operationId}Id`
+          : `${pathName}Id`;
 
       const paramObj = {
-        name: paramName,
+        name: param.name,
+        paramName: paramName,
         in: param.in,
         required: param.required ? param.required : false,
         style: param.style
@@ -134,7 +84,8 @@ const transformRoute = (route, pathName) => {
 
   // input: body content
   if (route.requestBody) {
-    const bodyContent = route.requestBody.content['application/json'];
+    const bodyContent =
+      route.requestBody.content[Object.keys(route.requestBody.content)[0]];
 
     const bodyObj = {
       schema: bodyContent.schema,
@@ -185,7 +136,7 @@ exports.transformRoutes = async (req, res, next) => {
         //  );
         routesMap[path][op] = transformRoute(
           oasPaths[path][op],
-          path.split('/')[1].toLocaleLowerCase()
+          path.split('/')[1].toLocaleLowerCase().slice(0, -1)
         );
       }
     }
