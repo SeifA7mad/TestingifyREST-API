@@ -8,7 +8,7 @@ const operationsNames = {
 const replaceAll = (str, mapObj) => {
     var re = new RegExp(Object.keys(mapObj).join("|"),"gi");
 
-    return str.replace(re, function(matched){
+    return str.replace(re, (matched) => {
         return mapObj[matched.toLowerCase()];
     });
 }
