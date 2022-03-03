@@ -13,10 +13,14 @@ const replaceAll = (str, mapObj) => {
     });
 }
 
-exports.prefixingkey = (keySchema, namePrefix) => {
-    if (keySchema.type === 'object' && keySchema.title) {
-        return `${keySchema.title}Id`;
-    }
-
+exports.prefixingkey = (namePrefix) => {
     return `${replaceAll(namePrefix, operationsNames)}Id`;
 }
+
+exports.extractPathName = (pathName) => {
+    let modifiedPath = pathName.split('/')[1].toLocaleLowerCase();
+
+    return modifiedPath.charAt(modifiedPath.length - 1) === 's'
+      ? modifiedPath.slice(0, -1)
+      : modifiedPath;
+};

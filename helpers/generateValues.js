@@ -1,4 +1,4 @@
-const { prefixingkey } = require('../helpers/prefixingKeys');
+const { prefixingkey } = require('../helpers/modifyingKeyNames');
 
 const generateValue = (typeSchema, namePrefix = '') => {
   if (
@@ -32,7 +32,8 @@ const generateValue = (typeSchema, namePrefix = '') => {
     let propName;
 
     for (let prop in typeSchema.properties) {
-      propName = prop !== 'id' ? prop : prefixingkey(prop, namePrefix);
+      propName =
+        prop !== 'id' ? prop : prefixingkey(prop, typeSchema.title ? typeSchema.title : namePrefix);
 
       if (!dictionary[propName]) {
         dictionary[propName] = {

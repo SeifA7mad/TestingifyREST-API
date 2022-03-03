@@ -1,6 +1,6 @@
 const SwaggerParser = require('@apidevtools/swagger-parser');
 const { generateValue } = require('../helpers/generateValues');
-const { prefixingkey } = require('../helpers/prefixingKeys');
+const { prefixingkey, extractPathName } = require('../helpers/modifyingKeyNames');
 
 const defaultStyles = {
   query: 'form',
@@ -53,7 +53,6 @@ const transformRoute = (route, pathName) => {
         param.name !== 'id'
           ? param.name
           : prefixingkey(
-              param.name,
               route.operationId ? route.operationId : pathName
             );
 
@@ -134,12 +133,10 @@ exports.transformRoutes = async (req, res, next) => {
       routesMap[path] = {};
       for (let op in oasPaths[path]) {
 
-        let pathModified = path.split('/')[1].toLocaleLowerCase();
-        pathModified.charAt(pathModified.length - 1) === 's'
-          ? (pathModified = pathModified.slice(0, -1))
-          : null;
-
-        routesMap[path][op] = transformRoute(oasPaths[path][op], pathModified);
+        routesMap[path][op] = transformRoute(
+          oasPaths[path][op],
+          extractPathName(path)
+        );
       }
     }
     // .post['/meals'].inputs.requestBody[0].content
