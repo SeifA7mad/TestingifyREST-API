@@ -1,9 +1,9 @@
 const SwaggerParser = require('@apidevtools/swagger-parser');
-const { generateValue } = require('../helpers/generateValues');
+const { generateValue } = require('../helpers/generate-values');
 const {
-  prefixingkey,
+  getPropertyName,
   extractPathName,
-} = require('../helpers/modifyingKeyNames');
+} = require('../helpers/transform-names');
 
 const defaultStyles = {
   query: 'form',
@@ -29,12 +29,16 @@ const stylesTemplate = {
 };
 
 const transformRoute = (route, pathName) => {
+  const prefixingValue = route.operationId ? route.operationId : pathName;
+
   const transformedRoute = {
     inputs: {
       parameters: [],
       requestBody: [],
     },
     outputs: {},
+    prefixingValue: prefixingValue,
+    basicUri: null,
   };
 
   // input: parameters
@@ -42,8 +46,9 @@ const transformRoute = (route, pathName) => {
   if (route.parameters) {
     let explode = null;
     route.parameters.forEach((param) => {
-      // no explode -> default = false (exception style 'form' default = true)
-      explode = param.explode
+
+      // no explode -> default = false (exception style 'form' default = true)\
+      explode = param.explode !== undefined
         ? +param.explode
         : !param.style || param.style === 'form'
         ? +true
@@ -52,19 +57,21 @@ const transformRoute = (route, pathName) => {
       // check to see if param name is not specified exactly ex: id
       // if not use the original name
       // if it use the operationId + param name if exixst <--> if not exist use the path name + param name
-      const paramName =
-        param.name.toLowerCase() !== 'id'
-          ? param.name
-          : prefixingkey(route.operationId ? route.operationId : pathName);
+      const paramName = getPropertyName(param.name, prefixingValue);
 
       const paramObj = {
         name: param.name,
-        paramName: paramName,
         in: param.in,
         required: param.required ? param.required : false,
         style: param.style
-          ? stylesTemplate[param.in][param.style][explode]
-          : stylesTemplate[param.in][defaultStyles[param.in]][explode],
+          ? stylesTemplate[param.in][param.style][explode].replace(
+              'p',
+              param.name
+            )
+          : stylesTemplate[param.in][defaultStyles[param.in]][explode].replace(
+              'p',
+              param.name
+            ),
       };
 
       // add paramter (schema, value) to the dictionry if not already exist
@@ -73,10 +80,7 @@ const transformRoute = (route, pathName) => {
           schema: param.schema,
           value: param.example
             ? param.example
-            : generateValue(
-                param.schema,
-                route.operationId ? route.operationId : pathName
-              ),
+            : generateValue(param.schema, prefixingValue),
         };
       }
       transformedRoute['inputs'].parameters.push(paramObj);
@@ -85,16 +89,14 @@ const transformRoute = (route, pathName) => {
 
   // input: body content
   if (route.requestBody) {
-    const bodyContent =
-      route.requestBody.content[Object.keys(route.requestBody.content)[0]];
+    const type = Object.keys(route.requestBody.content)[0];
+    const bodyContent = route.requestBody.content[type];
 
     const bodyObj = {
+      bodyType: type,
       schema: bodyContent.schema,
       required: route.requestBody.required ? route.requestBody.required : false,
-      example: generateValue(
-        bodyContent.schema,
-        route.operationId ? route.operationId : pathName
-      ),
+      example: generateValue(bodyContent.schema, prefixingValue),
     };
 
     transformedRoute['inputs'].requestBody.push(bodyObj);
@@ -106,7 +108,7 @@ const transformRoute = (route, pathName) => {
       transformedRoute.outputs[res] = route.responses[res];
     }
   }
-
+  // console.log(transformedRoute.inputs.parameters);
   return transformedRoute;
 };
 
@@ -138,12 +140,13 @@ exports.transformRoutes = async (req, res, next) => {
     }
     // .post['/meals'].inputs.requestBody[0].content
     // .get['/meals'].inputs.parameters[0].jsonSchema
-    //.get['/maps/api/elevation/json'].inputs.parameters
+    // ['/maps/api/elevation/json']['get'].inputs.parameters
     // ['/meals/{id}']['delete'].inputs.parameters
     // console.log(routesMap['/meals']['get'].inputs.parameters);
     // routesMap['/meals']['get'].outputs
     // routesMap['/meals']['post'].inputs.requestBody
-    console.log(dictionary);
+    // routesMap['/weather'].get.inputs
+    console.log(routesMap);
 
     req.routes = routesMap;
 
