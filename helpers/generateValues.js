@@ -33,7 +33,12 @@ const generateValue = (typeSchema, namePrefix = '') => {
 
     for (let prop in typeSchema.properties) {
       propName =
-        prop !== 'id' ? prop : prefixingkey(prop, typeSchema.title ? typeSchema.title : namePrefix);
+        prop.toLowerCase() !== 'id'
+          ? prop
+          : prefixingkey(
+              prop,
+              typeSchema.title ? typeSchema.title : namePrefix
+            );
 
       if (!dictionary[propName]) {
         dictionary[propName] = {

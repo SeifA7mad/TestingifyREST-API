@@ -1,6 +1,9 @@
 const SwaggerParser = require('@apidevtools/swagger-parser');
 const { generateValue } = require('../helpers/generateValues');
-const { prefixingkey, extractPathName } = require('../helpers/modifyingKeyNames');
+const {
+  prefixingkey,
+  extractPathName,
+} = require('../helpers/modifyingKeyNames');
 
 const defaultStyles = {
   query: 'form',
@@ -50,11 +53,9 @@ const transformRoute = (route, pathName) => {
       // if not use the original name
       // if it use the operationId + param name if exixst <--> if not exist use the path name + param name
       const paramName =
-        param.name !== 'id'
+        param.name.toLowerCase() !== 'id'
           ? param.name
-          : prefixingkey(
-              route.operationId ? route.operationId : pathName
-            );
+          : prefixingkey(route.operationId ? route.operationId : pathName);
 
       const paramObj = {
         name: param.name,
@@ -80,7 +81,6 @@ const transformRoute = (route, pathName) => {
       }
       transformedRoute['inputs'].parameters.push(paramObj);
     });
-    // console.log(transformedRoute['inputs'].parameters);
   }
 
   // input: body content
@@ -91,12 +91,10 @@ const transformRoute = (route, pathName) => {
     const bodyObj = {
       schema: bodyContent.schema,
       required: route.requestBody.required ? route.requestBody.required : false,
-      examples: route.requestBody.examples
-        ? route.requestBody.examples
-        : generateValue(
-            bodyContent.schema,
-            route.operationId ? route.operationId : pathName
-          ),
+      example: generateValue(
+        bodyContent.schema,
+        route.operationId ? route.operationId : pathName
+      ),
     };
 
     transformedRoute['inputs'].requestBody.push(bodyObj);
@@ -132,7 +130,6 @@ exports.transformRoutes = async (req, res, next) => {
     for (let path in oasPaths) {
       routesMap[path] = {};
       for (let op in oasPaths[path]) {
-
         routesMap[path][op] = transformRoute(
           oasPaths[path][op],
           extractPathName(path)
