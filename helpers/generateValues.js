@@ -1,3 +1,5 @@
+const { prefixingkey } = require('../helpers/prefixingKeys');
+
 const generateValue = (typeSchema, namePrefix = '') => {
   if (
     typeSchema.example ||
@@ -30,7 +32,7 @@ const generateValue = (typeSchema, namePrefix = '') => {
     let propName;
 
     for (let prop in typeSchema.properties) {
-      propName = prop !== 'id' ? prop : `${namePrefix}Id`;
+      propName = prop !== 'id' ? prop : prefixingkey(prop, namePrefix);
 
       if (!dictionary[propName]) {
         dictionary[propName] = {
@@ -47,7 +49,6 @@ const generateValue = (typeSchema, namePrefix = '') => {
   }
   return '';
 };
-
 
 module.exports = {
   generateValue,

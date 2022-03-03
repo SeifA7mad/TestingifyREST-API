@@ -1,5 +1,6 @@
 const SwaggerParser = require('@apidevtools/swagger-parser');
 const { generateValue } = require('../helpers/generateValues');
+const { prefixingkey } = require('../helpers/prefixingKeys');
 
 const defaultStyles = {
   query: 'form',
@@ -51,9 +52,10 @@ const transformRoute = (route, pathName) => {
       const paramName =
         param.name !== 'id'
           ? param.name
-          : route.operationId
-          ? `${route.operationId}Id`
-          : `${pathName}Id`;
+          : prefixingkey(
+              param.name,
+              route.operationId ? route.operationId : pathName
+            );
 
       const paramObj = {
         name: param.name,
@@ -147,7 +149,7 @@ exports.transformRoutes = async (req, res, next) => {
     // console.log(routesMap['/meals']['get'].inputs.parameters);
     // routesMap['/meals']['get'].outputs
     // routesMap['/meals']['post'].inputs.requestBody
-    console.log(routesMap['/meals'].get.inputs);
+    console.log(dictionary);
 
     req.routes = routesMap;
 
