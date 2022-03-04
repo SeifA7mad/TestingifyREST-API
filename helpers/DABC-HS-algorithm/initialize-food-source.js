@@ -1,9 +1,5 @@
-const urIParser = require('uri-template');
+const { parseUri } = require('../transform-uri');
 
-const transformUri = (basePathName, ) => {
-
-}
-
-const initializeFoodSources = (sourceRoutes) => {
+const initializeFoodSource = (routeName, routeObj) => {
 
 };

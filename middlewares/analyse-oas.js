@@ -1,5 +1,7 @@
 const SwaggerParser = require('@apidevtools/swagger-parser');
 const { generateValue } = require('../helpers/generate-values');
+const { parseUri } = require('../helpers/transform-uri');
+
 const {
   getPropertyName,
   extractPathName,
@@ -14,21 +16,22 @@ const defaultStyles = {
 
 const stylesTemplate = {
   path: {
-    simple: ['{p}', '{p*}'],
-    label: ['{.p}', '{.p*}'],
-    matrix: ['{;p}', '{;p*}'],
+    simple: ['p', 'p*'],
+    label: ['.p', '.p*'],
+    matrix: [';p', ';p*'],
   },
   query: {
     form: ['p', 'p*'],
-    spaceDelimited: ['%20', 'p*'],
-    pipeDelimited: ['|', 'p*'],
+    spaceDelimited: ['p', 'p*'],
+    pipeDelimited: ['p', 'p*'],
   },
   header: {
     simple: ['{p}', '{p*}'],
   },
 };
 
-const transformRoute = (route, pathName) => {
+const transformRoute = (route, path) => {
+  const pathName = extractPathName(path);
   const prefixingValue = route.operationId ? route.operationId : pathName;
 
   const transformedRoute = {
@@ -38,7 +41,7 @@ const transformRoute = (route, pathName) => {
     },
     outputs: {},
     prefixingValue: prefixingValue,
-    basicUri: null,
+    basicUri: path,
   };
 
   // input: parameters
@@ -46,13 +49,14 @@ const transformRoute = (route, pathName) => {
   if (route.parameters) {
     let explode = null;
     route.parameters.forEach((param) => {
-
       // no explode -> default = false (exception style 'form' default = true)\
-      explode = param.explode !== undefined
-        ? +param.explode
-        : !param.style || param.style === 'form'
-        ? +true
-        : +false;
+      // explode =
+      //   param.explode !== undefined
+      //     ? +param.explode
+      //     : !param.style || param.style === 'form'
+      //     ? +true
+      //     : +false;
+      explode = param.explode !== undefined ? +param.explode : +false;
 
       // check to see if param name is not specified exactly ex: id
       // if not use the original name
@@ -64,14 +68,8 @@ const transformRoute = (route, pathName) => {
         in: param.in,
         required: param.required ? param.required : false,
         style: param.style
-          ? stylesTemplate[param.in][param.style][explode].replace(
-              'p',
-              param.name
-            )
-          : stylesTemplate[param.in][defaultStyles[param.in]][explode].replace(
-              'p',
-              param.name
-            ),
+          ? stylesTemplate[param.in][param.style][explode]
+          : stylesTemplate[param.in][defaultStyles[param.in]][explode],
       };
 
       // add paramter (schema, value) to the dictionry if not already exist
@@ -108,6 +106,13 @@ const transformRoute = (route, pathName) => {
       transformedRoute.outputs[res] = route.responses[res];
     }
   }
+
+  if (transformedRoute.inputs.parameters.length !== 0) {
+    transformedRoute.basicUri = parseUri(
+      path,
+      transformedRoute.inputs.parameters
+    );
+  }
   // console.log(transformedRoute.inputs.parameters);
   return transformedRoute;
 };
@@ -132,10 +137,7 @@ exports.transformRoutes = async (req, res, next) => {
     for (let path in oasPaths) {
       routesMap[path] = {};
       for (let op in oasPaths[path]) {
-        routesMap[path][op] = transformRoute(
-          oasPaths[path][op],
-          extractPathName(path)
-        );
+        routesMap[path][op] = transformRoute(oasPaths[path][op], path);
       }
     }
     // .post['/meals'].inputs.requestBody[0].content
@@ -146,7 +148,7 @@ exports.transformRoutes = async (req, res, next) => {
     // routesMap['/meals']['get'].outputs
     // routesMap['/meals']['post'].inputs.requestBody
     // routesMap['/weather'].get.inputs
-    console.log(routesMap);
+    console.log(routesMap[Object.keys(routesMap)[1]]);
 
     req.routes = routesMap;
 
