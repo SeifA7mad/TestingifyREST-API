@@ -1,7 +1,6 @@
 const SwaggerParser = require('@apidevtools/swagger-parser');
-const { generateValue } = require('../helpers/generate-values');
-const { parseUri } = require('../helpers/transform-uri');
 
+const { generateValue } = require('../helpers/generate-values');
 const {
   getPropertyName,
   extractPathName,
@@ -41,13 +40,16 @@ const transformRoute = (route, path) => {
     },
     outputs: {},
     prefixingValue: prefixingValue,
-    basicUri: path,
+    basicUri: path.toString(),
   };
 
   // input: parameters
   // loop on parameters obj (if exist)
   if (route.parameters) {
     let explode = null;
+    let queryUri = '';
+
+    // loop on each parameter
     route.parameters.forEach((param) => {
       // no explode -> default = false (exception style 'form' default = true)\
       // explode =
@@ -60,7 +62,7 @@ const transformRoute = (route, path) => {
 
       // check to see if param name is not specified exactly ex: id
       // if not use the original name
-      // if it use the operationId + param name if exixst <--> if not exist use the path name + param name
+      // if it's use the operationId + param name if exixst <--> if not exist use the extracted path name + param name
       const paramName = getPropertyName(param.name, prefixingValue);
 
       const paramObj = {
@@ -81,8 +83,24 @@ const transformRoute = (route, path) => {
             : generateValue(param.schema, prefixingValue),
         };
       }
+
+      // add the param to the URI String
+      if (param.in === 'query') {
+        queryUri = `${queryUri}${paramObj.style.replace('p', paramObj.name)},`;
+      } else if (param.in === 'path') {
+        transformedRoute.basicUri = transformedRoute.basicUri.replace(
+          paramObj.name,
+          paramObj.style.replace('p', paramObj.name)
+        );
+      }
+
       transformedRoute['inputs'].parameters.push(paramObj);
     });
+
+    if (queryUri !== '') {
+      queryUri = `{?${queryUri.slice(0, -1)}}`;
+      transformedRoute.basicUri += queryUri;
+    }
   }
 
   // input: body content
@@ -107,25 +125,11 @@ const transformRoute = (route, path) => {
     }
   }
 
-  if (transformedRoute.inputs.parameters.length !== 0) {
-    transformedRoute.basicUri = parseUri(
-      path,
-      transformedRoute.inputs.parameters
-    );
-  }
   // console.log(transformedRoute.inputs.parameters);
   return transformedRoute;
 };
 
 exports.transformRoutes = async (req, res, next) => {
-  // const routesMap = {
-  //   get: {},
-  //   post: {},
-  //   put: {},
-  //   patch: {},
-  //   delete: {},
-  // };
-
   const routesMap = {};
 
   try {
@@ -140,6 +144,7 @@ exports.transformRoutes = async (req, res, next) => {
         routesMap[path][op] = transformRoute(oasPaths[path][op], path);
       }
     }
+
     // .post['/meals'].inputs.requestBody[0].content
     // .get['/meals'].inputs.parameters[0].jsonSchema
     // ['/maps/api/elevation/json']['get'].inputs.parameters
