@@ -47,11 +47,12 @@ const transformRoute = (route, path) => {
   // loop on parameters obj (if exist)
   if (route.parameters) {
     let explode = null;
+    let style = null;
     let queryUri = '';
 
     // loop on each parameter
     route.parameters.forEach((param) => {
-      // no explode -> default = false (exception style 'form' default = true)\
+      // no explode -> default = false (exception style 'form' default = true)
       // explode =
       //   param.explode !== undefined
       //     ? +param.explode
@@ -59,6 +60,9 @@ const transformRoute = (route, path) => {
       //     ? +true
       //     : +false;
       explode = param.explode !== undefined ? +param.explode : +false;
+      style = param.style
+        ? stylesTemplate[param.in][param.style][explode]
+        : stylesTemplate[param.in][defaultStyles[param.in]][explode];
 
       // check to see if param name is not specified exactly ex: id
       // if not use the original name
@@ -69,9 +73,6 @@ const transformRoute = (route, path) => {
         name: param.name,
         in: param.in,
         required: param.required ? param.required : false,
-        style: param.style
-          ? stylesTemplate[param.in][param.style][explode]
-          : stylesTemplate[param.in][defaultStyles[param.in]][explode],
       };
 
       // add paramter (schema, value) to the dictionry if not already exist
@@ -84,13 +85,14 @@ const transformRoute = (route, path) => {
         };
       }
 
-      // add the param to the URI String
+      // add the param to the URI String (queryUri) --> if param of type query
+      // replace the param in the basicUri with the new param style --> if param of type path
       if (param.in === 'query') {
-        queryUri = `${queryUri}${paramObj.style.replace('p', paramObj.name)},`;
+        queryUri = `${queryUri}${style.replace('p', paramObj.name)},`;
       } else if (param.in === 'path') {
         transformedRoute.basicUri = transformedRoute.basicUri.replace(
           paramObj.name,
-          paramObj.style.replace('p', paramObj.name)
+          style.replace('p', paramObj.name)
         );
       }
 
@@ -125,7 +127,6 @@ const transformRoute = (route, path) => {
     }
   }
 
-  // console.log(transformedRoute.inputs.parameters);
   return transformedRoute;
 };
 
@@ -153,7 +154,7 @@ exports.transformRoutes = async (req, res, next) => {
     // routesMap['/meals']['get'].outputs
     // routesMap['/meals']['post'].inputs.requestBody
     // routesMap['/weather'].get.inputs
-    console.log(routesMap[Object.keys(routesMap)[1]]);
+    console.log(routesMap[Object.keys(routesMap)[0]]);
 
     req.routes = routesMap;
 
