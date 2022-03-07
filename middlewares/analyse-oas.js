@@ -112,6 +112,7 @@ const transformRoute = (route, path) => {
 
     const bodyObj = {
       bodyType: type,
+      properties: [...Object.keys(bodyContent.schema.properties)],
       schema: bodyContent.schema,
       required: route.requestBody.required ? route.requestBody.required : false,
       example: generateValue(bodyContent.schema, prefixingValue),
@@ -154,7 +155,7 @@ exports.transformRoutes = async (req, res, next) => {
     // routesMap['/meals']['get'].outputs
     // routesMap['/meals']['post'].inputs.requestBody
     // routesMap['/weather'].get.inputs
-    console.log(routesMap[Object.keys(routesMap)[0]]);
+    // console.log(routesMap[Object.keys(routesMap)[0]]);
 
     req.routes = routesMap;
 

@@ -1,5 +1,9 @@
 const { getPropertyName } = require('../helpers/transform-names');
 
+const generateRandomInt = (max = 0, min = 0) => {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+};
+
 const generateValue = (typeSchema, namePrefix = '') => {
   if (
     typeSchema.example ||
@@ -20,10 +24,7 @@ const generateValue = (typeSchema, namePrefix = '') => {
 
   if (typeSchema.type === 'number' || typeSchema.type === 'integer') {
     return typeSchema.maximum
-      ? Math.floor(
-          Math.random() * (typeSchema.maximum - typeSchema.minimum) +
-            typeSchema.minimum
-        )
+      ? generateRandomInt(typeSchema.maximum, typeSchema.minimum)
       : 0;
   }
 
@@ -55,4 +56,5 @@ const generateValue = (typeSchema, namePrefix = '') => {
 
 module.exports = {
   generateValue,
+  generateRandomInt
 };
