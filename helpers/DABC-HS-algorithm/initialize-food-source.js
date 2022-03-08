@@ -16,10 +16,15 @@ const initializeFoodSource = (routeName, routeObj) => {
     chromosomes: [],
   };
 
+  const routeKeys = Object.keys(routeObj);
+
+  if (routeKeys.length === 1) {
+    initialPopulation.chromosomes.push(routeKeys[0]);
+    return console.log(initialPopulation);
+  }
+
   const initType =
     initialPopulationType[generateRandomInt(initialPopulationType.length - 1)];
-
-  const routeKeys = Object.keys(routeObj);
 
   if (initType === 'randomSampling') {
     const randomStopCondition = generateRandomInt(routeKeys.length, 1);
@@ -35,7 +40,9 @@ const initializeFoodSource = (routeName, routeObj) => {
 
   if (initType === 'smartSampling') {
     const randomSmartChoice = generateRandomInt(smartSampling.length - 1);
-    if (smartSampling[randomSmartChoice].every(op => routeKeys.includes(op))) {
+    if (
+      smartSampling[randomSmartChoice].every((op) => routeKeys.includes(op))
+    ) {
       initialPopulation.chromosomes = smartSampling[randomSmartChoice];
     }
   }
