@@ -6,6 +6,5 @@ exports.generateTestSuits = (req, res, next) => {
   for (let route in req.routes) {
     initializeFoodSource(route, req.routes[route]);
   }
-
   next();
 };

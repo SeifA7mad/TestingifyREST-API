@@ -5,16 +5,14 @@ const generateRandomInt = (max = 0, min = 0) => {
 };
 
 const generateValue = (typeSchema, namePrefix = '') => {
-  if (
-    typeSchema.example ||
-    typeSchema.default ||
-    typeSchema.enum ||
-    typeSchema.items
-  ) {
+  if (typeSchema.type === 'string' && !typeSchema.enum) {
+    const values = [typeSchema.example, typeSchema.default, ''];
+    return values.find((value) => value !== undefined);
+  }
+
+  if (typeSchema.enum || typeSchema.items) {
     const values = [
-      typeSchema.example,
-      typeSchema.default,
-      typeSchema.enum ? typeSchema.enum[0] : undefined,
+      typeSchema.enum ? typeSchema.enum[generateRandomInt(typeSchema.enum.length - 1)] : undefined,
       typeSchema.items
         ? [generateValue(typeSchema.items, namePrefix)]
         : undefined,
@@ -23,9 +21,7 @@ const generateValue = (typeSchema, namePrefix = '') => {
   }
 
   if (typeSchema.type === 'number' || typeSchema.type === 'integer') {
-    return typeSchema.maximum
-      ? generateRandomInt(typeSchema.maximum, typeSchema.minimum)
-      : 0;
+    return generateRandomInt(typeSchema.maximum ? typeSchema.maximum : 0, typeSchema.minimum ? typeSchema.minimum : 0);
   }
 
   if (typeSchema.type === 'object') {
@@ -56,5 +52,5 @@ const generateValue = (typeSchema, namePrefix = '') => {
 
 module.exports = {
   generateValue,
-  generateRandomInt
+  generateRandomInt,
 };
