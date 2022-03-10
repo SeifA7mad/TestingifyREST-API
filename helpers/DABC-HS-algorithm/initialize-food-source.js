@@ -6,25 +6,26 @@ const smartSampling = [
   ['post', 'put'],
   ['post', 'patch'],
   ['post', 'delete'],
+  ['get', 'delete'],
+  ['get'],
 ];
 
-const initialPopulationType = ['randomSampling', 'smartSampling'];
+const populationType = ['randomSampling', 'smartSampling'];
 
 const initializeFoodSource = (routeName, routeObj) => {
-  const initialPopulation = {
+  const population = {
     routeName: routeName,
-    chromosomes: [],
+    operationsOrder: [],
   };
 
   const routeKeys = Object.keys(routeObj);
 
   if (routeKeys.length === 1) {
-    initialPopulation.chromosomes.push(routeKeys[0]);
-    return console.log(initialPopulation);
+    population.operationsOrder.push(routeKeys[0]);
+    return console.log(population);
   }
 
-  const initType =
-    initialPopulationType[generateRandomInt(initialPopulationType.length - 1)];
+  const initType = populationType[generateRandomInt(populationType.length - 1)];
 
   if (initType === 'randomSampling') {
     const randomStopCondition = generateRandomInt(routeKeys.length, 1);
@@ -32,22 +33,26 @@ const initializeFoodSource = (routeName, routeObj) => {
     let randomChoice = null;
     for (let i = 0; i < randomStopCondition; i++) {
       randomChoice = generateRandomInt(routeKeys.length - 1);
-      if (!initialPopulation.chromosomes.includes(routeKeys[randomChoice])) {
-        initialPopulation.chromosomes.push(routeKeys[randomChoice]);
+      if (!population.operationsOrder.includes(routeKeys[randomChoice])) {
+        population.operationsOrder.push(routeKeys[randomChoice]);
       }
     }
   }
 
   if (initType === 'smartSampling') {
-    const randomSmartChoice = generateRandomInt(smartSampling.length - 1);
-    if (
-      smartSampling[randomSmartChoice].every((op) => routeKeys.includes(op))
-    ) {
-      initialPopulation.chromosomes = smartSampling[randomSmartChoice];
+    let foundSample = true;
+    let randomSmartChoice;
+
+    while (foundSample) {
+      randomSmartChoice = generateRandomInt(smartSampling.length - 1);
+      if (smartSampling[randomSmartChoice].some((op) => routeKeys.includes(op))) {
+        population.operationsOrder = smartSampling[randomSmartChoice];
+        foundSample = false;
+      }
     }
   }
 
-  console.log(initialPopulation);
+  console.log(population);
 };
 
 module.exports = {

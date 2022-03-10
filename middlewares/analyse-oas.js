@@ -112,6 +112,7 @@ const transformRoute = (route, path) => {
 
     const bodyObj = {
       bodyType: type,
+      // TODO: allof handle
       properties: [...Object.keys(bodyContent.schema.properties)],
       schema: bodyContent.schema,
       required: route.requestBody.required ? route.requestBody.required : false,
