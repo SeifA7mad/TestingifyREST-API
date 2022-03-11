@@ -6,7 +6,7 @@ exports.generateTestSuits = (req, res, next) => {
   // each route -> 5 diff operatrion
   // each operation -> 3 diff stutas code '2xx, 4xx, 5xx'
   // (5 * 3)  = 30
-  const populationSize = 15;
+  const populationSize = 5;
   const trials = new Array(populationSize).fill(0);
 
   // maximum number of fitness evaluations

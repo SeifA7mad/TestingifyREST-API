@@ -1,11 +1,23 @@
+const crypto = require('crypto');
+
 const generateRandomInt = (max = 0, min = 0) => {
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
 const generateNominalValue = (typeSchema) => {
   if (typeSchema.type === 'string' && !typeSchema.enum) {
-    const values = [typeSchema.example, typeSchema.default, ''];
-    return values.find((value) => value !== undefined);
+    if (typeSchema.example || typeSchema.default) {
+      const values = [typeSchema.example, typeSchema.default];
+      return values.find((value) => value !== undefined);
+    }
+
+    if (typeSchema.minLength || typeSchema.maxLength) {
+      return crypto
+        .randomBytes(typeSchema.minLength || typeSchema.maxLength)
+        .toString('hex');
+    }
+
+    return '';
   }
 
   if (typeSchema.type === 'boolean') {
@@ -53,7 +65,7 @@ const generateNominalValue = (typeSchema) => {
     }
     return obj;
   }
-  return '';
+  return null;
 };
 
 const generateMutatedValue = (typeSchema) => {
