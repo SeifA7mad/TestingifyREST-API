@@ -1,83 +1,87 @@
-const { generateRandomInt, generateValue } = require('../generate-values');
-const { getPropertyName } = require('../transform-names');
+const {
+  generateRandomInt,
+  generateNominalValue,
+  generateMutatedValue,
+} = require('../generate-values');
 
-const smartSampling = [
-  ['post', 'get'],
-  ['post'],
-  ['post', 'put'],
-  ['post', 'patch'],
-  ['post', 'delete'],
-  ['get', 'delete'],
-  ['get'],
-];
+// const { getPropertyName } = require('../transform-names');
 
-const populationType = ['randomSampling', 'smartSampling'];
+// const smartSampling = [
+//   ['post', 'get'],
+//   ['post'],
+//   ['post', 'put'],
+//   ['post', 'patch'],
+//   ['post', 'delete'],
+//   ['get', 'delete'],
+//   ['get'],
+// ];
 
-const generateChromosome = (operatrionObj) => {
-  // const chromosome = {
-  //   parameters: {},
-  //   bodyContent: [],
-  // };
+const ChromsomeType = ['nominal', 'mutated'];
 
-  // if (operatrionObj.inputs.parameters.length > 0) {
-  //   let paramName;
-  //   operatrionObj.inputs.parameters.forEach((param) => {
-  //     paramName = getPropertyName(param.name, operatrionObj.prefixingValue);
-  //     chromosome.parameters[param.name] = dictionary[paramName].value;
-  //   });
+const generateChromosome = (operatrionObj, type) => {
+  const chromosome = {
+    parameters: [],
+    bodyContent: [],
+  };
 
-  //   // const URITemplate = parse(operatrionObj.basicUri);
-  //   // chromosome.URI = URITemplate.expand(chromosome.genes.parameters);
-  // }
+  if (operatrionObj.inputs.parameters.length > 0) {
+    if (type === 'nominal') {
+      operatrionObj.inputs.parameters.forEach((param) => {
+        if (param.required) {
+          chromosome.parameters.push({
+            name: param.name,
+            value: generateNominalValue(param.schema),
+          });
+        } else {
+          if (generateRandomInt(1)) {
+            chromosome.parameters.push({
+              name: param.name,
+              value: generateNominalValue(param.schema),
+            });
+          }
+        }
+      });
+    }
 
-  // return chromosome;
+    if (type === 'mutated') {
+      operatrionObj.inputs.parameters.forEach((param) => {
+        if (generateRandomInt(1)) {
+          chromosome.parameters.push({
+            name: param.name,
+            value: generateMutatedValue(param.schema),
+          });
+        }
+      });
+    }
+  }
+
+  if (operatrionObj.inputs.requestBody.length > 0) {
+    
+  } 
+  return chromosome;
 };
 
-const initializeFoodSource = (routeObj) => {
-  // const population = {};
+const initializeFoodSource = (routeObj, routeKeys, size) => {
+  const population = [];
+  let testType;
+  let randomOperation;
+  let genome;
 
-  // const routeKeys = Object.keys(routeObj);
+  for (let i = 0; i < size; i++) {
+    testType = generateRandomInt(1);
+    randomOperation = generateRandomInt(routeKeys.length - 1);
+    genome = {
+      operation: routeKeys[randomOperation],
+      testType: ChromsomeType[testType],
+      ...generateChromosome(
+        routeObj[routeKeys[randomOperation]],
+        ChromsomeType[testType]
+      ),
+    };
+    population.push(genome);
+  }
 
-  // if (routeKeys.length === 1) {
-  //   population[routeKeys[0]] = generateChromosome(
-  //     routeObj[routeKeys[0]]
-  //   );
-  //   return;
-  // }
-
-  // const initType = populationType[generateRandomInt(populationType.length - 1)];
-  // let operationsOrder = [];
-
-  // if (initType === 'randomSampling') {
-  //   const randomStopCondition = generateRandomInt(routeKeys.length, 1);
-
-  //   let randomChoice = null;
-  //   for (let i = 0; i < randomStopCondition; i++) {
-  //     randomChoice = generateRandomInt(routeKeys.length - 1);
-  //     operationsOrder.push(routeKeys[randomChoice]);
-  //   }
-  // }
-
-  // if (initType === 'smartSampling') {
-  //   let foundSample = true;
-  //   let randomSmartChoice;
-
-  //   while (foundSample) {
-  //     randomSmartChoice = generateRandomInt(smartSampling.length - 1);
-  //     if (
-  //       smartSampling[randomSmartChoice].some((op) => routeKeys.includes(op))
-  //     ) {
-  //       operationsOrder = smartSampling[randomSmartChoice];
-  //       foundSample = false;
-  //     }
-  //   }
-  // }
-
-  // operationsOrder.forEach((op) => {
-  //   if (routeObj[op]) {
-  //     population[op] = generateChromosome(routeObj[op]);
-  //   }
-  // });
+  console.log(population);
 };
 
 module.exports = {

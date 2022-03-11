@@ -1,10 +1,6 @@
 const SwaggerParser = require('@apidevtools/swagger-parser');
 
-const { generateValue } = require('../helpers/generate-values');
-const {
-  getPropertyName,
-  extractPathName,
-} = require('../helpers/transform-names');
+const { extractPathName } = require('../helpers/transform-names');
 
 const defaultStyles = {
   query: 'form',
@@ -74,7 +70,13 @@ const transformRoute = (route, path) => {
         name: param.name,
         in: param.in,
         required: param.required ? param.required : false,
-        schema: param.schema
+        schema: param.schema,
+        numberOfPossiableValues:
+          param.schema.type === 'boolean'
+            ? 2
+            : param.schema.enum
+            ? param.schema.enum.length
+            : 0,
       };
 
       // add paramter (schema, value) to the dictionry if not already exist

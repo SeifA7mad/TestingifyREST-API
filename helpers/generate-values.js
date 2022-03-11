@@ -1,10 +1,8 @@
-// const { getPropertyName } = require('../helpers/transform-names');
-
 const generateRandomInt = (max = 0, min = 0) => {
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
-const generateValue = (typeSchema, namePrefix = '') => {
+const generateNominalValue = (typeSchema) => {
   if (typeSchema.type === 'string' && !typeSchema.enum) {
     const values = [typeSchema.example, typeSchema.default, ''];
     return values.find((value) => value !== undefined);
@@ -16,16 +14,19 @@ const generateValue = (typeSchema, namePrefix = '') => {
 
   if (typeSchema.enum || typeSchema.items) {
     const values = [
-      typeSchema.enum ? typeSchema.enum[generateRandomInt(typeSchema.enum.length - 1)] : undefined,
-      typeSchema.items
-        ? [generateValue(typeSchema.items, namePrefix)]
+      typeSchema.enum
+        ? typeSchema.enum[generateRandomInt(typeSchema.enum.length - 1)]
         : undefined,
+      typeSchema.items ? [generateNominalValue(typeSchema.items)] : undefined,
     ];
     return values.find((value) => value !== undefined);
   }
 
   if (typeSchema.type === 'number' || typeSchema.type === 'integer') {
-    return generateRandomInt(typeSchema.maximum ? typeSchema.maximum : 0, typeSchema.minimum ? typeSchema.minimum : 0);
+    return generateRandomInt(
+      typeSchema.maximum ? typeSchema.maximum : 0,
+      typeSchema.minimum ? typeSchema.minimum : 0
+    );
   }
 
   if (typeSchema.type === 'object') {
@@ -48,14 +49,19 @@ const generateValue = (typeSchema, namePrefix = '') => {
       // }
 
       // obj[propName] = dictionary[propName].value;
-      obj[propName] = generateValue(typeSchema.properties[prop]);
+      obj[propName] = generateNominalValue(typeSchema.properties[prop]);
     }
     return obj;
   }
   return '';
 };
 
+const generateMutatedValue = (typeSchema) => {
+  return '';
+};
+
 module.exports = {
-  generateValue,
+  generateNominalValue,
+  generateMutatedValue,
   generateRandomInt,
 };
