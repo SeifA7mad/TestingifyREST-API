@@ -3,6 +3,7 @@ const {
   generateNominalValue,
 } = require('../generate-values');
 
+
 const generateChromosome = (operatrionObj) => {
   const chromosome = {
     parameters: [],
@@ -28,6 +29,9 @@ const generateChromosome = (operatrionObj) => {
   }
 
   if (operatrionObj.inputs.requestBody.length > 0) {
+    operatrionObj.inputs.requestBody.forEach((content) => {
+      chromosome.bodyContent.push(generateNominalValue(content.schema));
+    });
   }
   return chromosome;
 };

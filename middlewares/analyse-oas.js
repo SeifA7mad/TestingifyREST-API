@@ -61,11 +61,6 @@ const transformRoute = (route, path) => {
         ? stylesTemplate[param.in][param.style][explode]
         : stylesTemplate[param.in][defaultStyles[param.in]][explode];
 
-      // check to see if param name is not specified exactly ex: id
-      // if not use the original name
-      // if it's use the operationId + param name if exixst <--> if not exist use the extracted path name + param name
-      // const paramName = getPropertyName(param.name, prefixingValue);
-
       const paramObj = {
         name: param.name,
         in: param.in,
@@ -78,16 +73,6 @@ const transformRoute = (route, path) => {
             ? param.schema.enum.length
             : 0,
       };
-
-      // add paramter (schema, value) to the dictionry if not already exist
-      // if (!dictionary[paramName]) {
-      //   dictionary[paramName] = {
-      //     schema: param.schema,
-      //     value: param.example
-      //       ? param.example
-      //       : generateValue(param.schema, prefixingValue),
-      //   };
-      // }
 
       // add the param to the URI String (queryUri) --> if param of type query
       // replace the param in the basicUri with the new param style --> if param of type path

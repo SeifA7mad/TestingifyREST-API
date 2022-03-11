@@ -19,6 +19,7 @@
     "dotenv": "^16.0.0",
     "express": "^4.17.2",
     "multer": "^1.4.4",
+    "openapi-sampler": "^1.2.1",
     "uri-template": "^2.0.0"
   },
   "devDependencies": {

@@ -43,25 +43,8 @@ const generateNominalValue = (typeSchema) => {
 
   if (typeSchema.type === 'object') {
     const obj = {};
-    let propName;
-
     for (let prop in typeSchema.properties) {
-      // propName = getPropertyName(
-      //   prop,
-      //   typeSchema.title ? typeSchema.title : namePrefix
-      // );
-
-      // if (!dictionary[propName]) {
-      //   dictionary[propName] = {
-      //     schema: typeSchema.properties[prop],
-      //     value: typeSchema.properties[prop].example
-      //       ? typeSchema.properties[prop].example
-      //       : generateValue(typeSchema.properties[prop], namePrefix),
-      //   };
-      // }
-
-      // obj[propName] = dictionary[propName].value;
-      obj[propName] = generateNominalValue(typeSchema.properties[prop]);
+      obj[prop] = generateNominalValue(typeSchema.properties[prop]);
     }
     return obj;
   }
