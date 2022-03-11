@@ -59,6 +59,7 @@ const transformRoute = (route, path) => {
       //     : !param.style || param.style === 'form'
       //     ? +true
       //     : +false;
+
       explode = param.explode !== undefined ? +param.explode : +false;
       style = param.style
         ? stylesTemplate[param.in][param.style][explode]
@@ -67,23 +68,24 @@ const transformRoute = (route, path) => {
       // check to see if param name is not specified exactly ex: id
       // if not use the original name
       // if it's use the operationId + param name if exixst <--> if not exist use the extracted path name + param name
-      const paramName = getPropertyName(param.name, prefixingValue);
+      // const paramName = getPropertyName(param.name, prefixingValue);
 
       const paramObj = {
         name: param.name,
         in: param.in,
         required: param.required ? param.required : false,
+        schema: param.schema
       };
 
       // add paramter (schema, value) to the dictionry if not already exist
-      if (!dictionary[paramName]) {
-        dictionary[paramName] = {
-          schema: param.schema,
-          value: param.example
-            ? param.example
-            : generateValue(param.schema, prefixingValue),
-        };
-      }
+      // if (!dictionary[paramName]) {
+      //   dictionary[paramName] = {
+      //     schema: param.schema,
+      //     value: param.example
+      //       ? param.example
+      //       : generateValue(param.schema, prefixingValue),
+      //   };
+      // }
 
       // add the param to the URI String (queryUri) --> if param of type query
       // replace the param in the basicUri with the new param style --> if param of type path
@@ -116,7 +118,6 @@ const transformRoute = (route, path) => {
       // properties: [...Object.keys(bodyContent.schema.properties)],
       schema: bodyContent.schema,
       required: route.requestBody.required ? route.requestBody.required : false,
-      example: generateValue(bodyContent.schema, prefixingValue),
     };
 
     transformedRoute['inputs'].requestBody.push(bodyObj);
