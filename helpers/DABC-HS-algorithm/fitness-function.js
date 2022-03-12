@@ -26,4 +26,6 @@ exports.fitness = (population, numbers) => {
   }
 
   // TODO: check Status code coverage
+
+  const fitnessValue = (operationCoverage + parameterCoverage + parameterValueCoverage) / 3;
 };
