@@ -36,7 +36,8 @@ exports.generateTestSuits = (req, res, next) => {
       );
 
       totalNumberOfFinitValues += numberOfValues.reduce(
-        (prev, cur) => prev + cur, 0
+        (prev, cur) => prev + cur,
+        0
       );
     });
 
@@ -46,7 +47,7 @@ exports.generateTestSuits = (req, res, next) => {
       populationSize
     );
 
-    fitness(initPopulation, req.routes[route], {
+    fitness(initPopulation, {
       totalNumberOfOperations,
       totalNumberOfInputs,
       totalNumberOfFinitValues,

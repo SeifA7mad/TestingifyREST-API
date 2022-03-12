@@ -1,4 +1,4 @@
-exports.fitness = (population, routeObj, numbers) => {
+exports.fitness = (population, numbers) => {
   // check Operations Coverage
   const numberOfOperations = new Set(population.map((ch) => ch.operation)).size;
   const operationCoverage =
