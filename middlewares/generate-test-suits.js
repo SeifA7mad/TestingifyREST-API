@@ -46,8 +46,6 @@ exports.generateTestSuits = (req, res, next) => {
       populationSize
     );
 
-    console.log(initPopulation);
-
     fitness(initPopulation, {
       totalNumberOfOperations,
       totalNumberOfInputs,

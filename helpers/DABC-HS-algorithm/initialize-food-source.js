@@ -15,8 +15,7 @@ const generateChromosome = (operatrionObj) => {
         chromosome.parameters.push({
           name: param.name,
           value: generateNominalValue(param.schema),
-          isFinite:
-            param.schema.type === 'boolean' || param.schema.enum ? true : false,
+          isFinite: param.numberOfPossiableValues > 0 ? true : false,
         });
       }
     });
