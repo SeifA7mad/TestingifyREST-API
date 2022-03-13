@@ -34,7 +34,9 @@ const initializeFoodSource = (routeObj, routeKeys, size) => {
   let randomOperation;
   let genome;
 
-  for (let i = 0; i < size; i++) {
+  const iterration = generateRandomInt(size, 1);
+
+  for (let i = 0; i < iterration; i++) {
     randomOperation = generateRandomInt(routeKeys.length - 1);
     genome = {
       operation: routeKeys[randomOperation],

@@ -6,10 +6,10 @@ const { fitness } = require('../helpers/DABC-HS-algorithm/fitness-function');
 
 exports.generateTestSuits = (req, res, next) => {
   // each route -> 5 diff operatrion
-  // each operation -> 3 diff stutas code '2xx, 4xx, 5xx'
-  // (5 * 3)  = 30
-  const populationSize = 5;
-  const trials = new Array(populationSize).fill(0);
+  // each operation -> 2 diff stutas code '2xx, (4xx, 5xx)'
+  // (5 * 2)  = 10
+  const maxPopulationSize = 10;
+  const trials = new Array(maxPopulationSize).fill(0);
 
   // maximum number of fitness evaluations
   let mfe = 50;
@@ -43,14 +43,17 @@ exports.generateTestSuits = (req, res, next) => {
     const initPopulation = initializeFoodSource(
       req.routes[route],
       routeKeys,
-      populationSize
+      maxPopulationSize
     );
 
-    fitness(initPopulation, {
+    const initPopulationFitnessValue = fitness(initPopulation, {
       totalNumberOfOperations,
       totalNumberOfInputs,
       totalNumberOfFiniteValues,
+      maxPopulationSize,
     });
+
+    // console.log(initPopulation, initPopulationFitnessValue);
   }
   next();
 };

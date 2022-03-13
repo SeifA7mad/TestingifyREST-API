@@ -26,7 +26,7 @@ exports.fitness = (population, numbers) => {
       numberOfFiniteValues / numbers.totalNumberOfFiniteValues;
   }
 
-  // TODO: check Status code coverage
+  // check Status code coverage
   const totalNumberOfExpectedStatusCode = numberOfOperations * 2;
   const numberOfExpectedStatusCode = new Set(
     population.map((ch) => ch.operation + ch.testType)
@@ -35,9 +35,13 @@ exports.fitness = (population, numbers) => {
   const statusCodeCoverage =
     numberOfExpectedStatusCode / totalNumberOfExpectedStatusCode;
 
+  // check population size -> more is worst
+  const populationSizeCoverage = population.length / numbers.maxPopulationSize;
+
   return (fitnessValue =
     operationCoverage +
     parameterCoverage +
     parameterValueCoverage +
-    statusCodeCoverage);
+    statusCodeCoverage -
+    populationSizeCoverage);
 };
