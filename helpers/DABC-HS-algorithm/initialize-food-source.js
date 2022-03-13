@@ -3,8 +3,10 @@ const {
   generateNominalValue,
 } = require('../generate-values');
 
-const generateChromosome = (operatrionObj) => {
+const generateChromosome = (opertionName, operatrionObj, testType) => {
   const chromosome = {
+    operation: opertionName,
+    testType: testType,
     parameters: [],
     bodyContent: [],
   };
@@ -38,12 +40,22 @@ const initializeFoodSource = (routeObj, routeKeys, size) => {
 
   for (let i = 0; i < iterration; i++) {
     randomOperation = generateRandomInt(routeKeys.length - 1);
-    genome = {
-      operation: routeKeys[randomOperation],
-      testType: 'nominal',
-      ...generateChromosome(routeObj[routeKeys[randomOperation]]),
-    };
-    population.push(genome);
+    // genome = {
+    //   operation: routeKeys[randomOperation],
+    //   testType: 'nominal',
+    //   ...generateChromosome(
+    //     routeKeys[randomOperation],
+    //     routeObj[routeKeys[randomOperation]],
+    //     'nominal'
+    //   ),
+    // };
+    population.push(
+      generateChromosome(
+        routeKeys[randomOperation],
+        routeObj[routeKeys[randomOperation]],
+        'nominal'
+      )
+    );
   }
 
   return population;
