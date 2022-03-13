@@ -11,13 +11,15 @@ const generateNominalValue = (typeSchema) => {
       return values.find((value) => value !== undefined);
     }
 
-    if (typeSchema.minLength || typeSchema.maxLength) {
-      return crypto
-        .randomBytes(typeSchema.minLength || typeSchema.maxLength)
-        .toString('hex');
-    }
-
-    return '';
+    return crypto
+      .randomBytes(
+        typeSchema.minLength
+          ? typeSchema.minLength
+          : typeSchema.maxLength
+          ? typeSchema.maxLength
+          : 5
+      )
+      .toString('hex');
   }
 
   if (typeSchema.type === 'boolean') {

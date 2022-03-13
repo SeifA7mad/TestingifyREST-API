@@ -19,12 +19,17 @@ exports.generateTestSuits = (req, res, next) => {
   let totalNumberOfInputs;
   let totalNumberOfFiniteValues;
 
+  // main loop => loop on each api route to run the DABS-HS algorithm on => return the best TC for each route
+  // why?? => to ensure the path coverage for the Test Suite (each route in the api must have at least one HTTP request to be tested)
   for (let route in req.routes) {
+
+    // init some values
+    routeKeys = Object.keys(req.routes[route]);
+    totalNumberOfOperations = routeKeys.length;
     totalNumberOfInputs = 0;
     totalNumberOfFiniteValues = 0;
 
-    routeKeys = Object.keys(req.routes[route]);
-    totalNumberOfOperations = routeKeys.length;
+    // loop to find the totalNumberOfInputs & totalNumberOfFiniteValues for every operation in this route
     routeKeys.forEach((key) => {
       totalNumberOfInputs +=
         req.routes[route][key].inputs.parameters.length +
@@ -40,18 +45,20 @@ exports.generateTestSuits = (req, res, next) => {
       );
     });
 
+    const totalNumbers = {
+      totalNumberOfOperations,
+      totalNumberOfInputs,
+      totalNumberOfFiniteValues,
+      maxPopulationSize,
+    };
+
     const initPopulation = initializeFoodSource(
       req.routes[route],
       routeKeys,
       maxPopulationSize
     );
 
-    const initPopulationFitnessValue = fitness(initPopulation, {
-      totalNumberOfOperations,
-      totalNumberOfInputs,
-      totalNumberOfFiniteValues,
-      maxPopulationSize,
-    });
+    const initPopulationFitnessValue = fitness(initPopulation, totalNumbers);
 
     // console.log(initPopulation, initPopulationFitnessValue);
   }
