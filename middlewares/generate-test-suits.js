@@ -15,14 +15,13 @@ exports.generateTestSuits = (req, res, next) => {
   let mfe = 50;
 
   let routeKeys;
-  const totalNumberOfStatusCode = 3;
   let totalNumberOfOperations;
   let totalNumberOfInputs;
-  let totalNumberOfFinitValues;
+  let totalNumberOfFiniteValues;
 
   for (let route in req.routes) {
     totalNumberOfInputs = 0;
-    totalNumberOfFinitValues = 0;
+    totalNumberOfFiniteValues = 0;
 
     routeKeys = Object.keys(req.routes[route]);
     totalNumberOfOperations = routeKeys.length;
@@ -35,7 +34,7 @@ exports.generateTestSuits = (req, res, next) => {
         (param) => param.numberOfPossiableValues
       );
 
-      totalNumberOfFinitValues += numberOfValues.reduce(
+      totalNumberOfFiniteValues += numberOfValues.reduce(
         (prev, cur) => prev + cur,
         0
       );
@@ -47,10 +46,12 @@ exports.generateTestSuits = (req, res, next) => {
       populationSize
     );
 
+    console.log(initPopulation);
+
     fitness(initPopulation, {
       totalNumberOfOperations,
       totalNumberOfInputs,
-      totalNumberOfFinitValues,
+      totalNumberOfFiniteValues,
     });
   }
   next();

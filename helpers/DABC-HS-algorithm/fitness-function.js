@@ -12,20 +12,32 @@ exports.fitness = (population, numbers) => {
 
   // check Parameter value coverage
   let parameterValueCoverage = 0;
-  if (numbers.totalNumberOfFinitValues != 0) {
-    const finitParams = [];
+  if (numbers.totalNumberOfFiniteValues != 0) {
+    const finiteParams = [];
     population.forEach((ch) => {
-      finitParams.push(...ch.parameters.filter((param) => param.isFinite));
+      finiteParams.push(...ch.parameters.filter((param) => param.isFinite));
     });
+
     const numberOfFiniteValues = new Set(
-      finitParams.map((param) => param.value)
+      finiteParams.map((param) => param.value)
     ).size;
 
     parameterValueCoverage =
-      numberOfFiniteValues / numbers.totalNumberOfFinitValues;
+      numberOfFiniteValues / numbers.totalNumberOfFiniteValues;
   }
 
   // TODO: check Status code coverage
+  const totalNumberOfExpectedStatusCode = numberOfOperations * 2;
+  const numberOfExpectedStatusCode = new Set(
+    population.map((ch) => ch.operation + ch.testType)
+  ).size;
 
-  const fitnessValue = (operationCoverage + parameterCoverage + parameterValueCoverage) / 3;
+  const statusCodeCoverage =
+    numberOfExpectedStatusCode / totalNumberOfExpectedStatusCode;
+
+  return (fitnessValue =
+    operationCoverage +
+    parameterCoverage +
+    parameterValueCoverage +
+    statusCodeCoverage);
 };
