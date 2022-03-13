@@ -1,12 +1,13 @@
 const {
   generateRandomInt,
   generateNominalValue,
+  isFinite,
 } = require('../generate-values');
 
 const generateChromosome = (operatrionObj) => {
   const chromosome = {
     parameters: [],
-    bodyContent: [],
+    properties: [],
   };
 
   if (operatrionObj.inputs.parameters.length > 0) {
@@ -14,18 +15,34 @@ const generateChromosome = (operatrionObj) => {
       if (param.required || generateRandomInt(1)) {
         chromosome.parameters.push({
           name: param.name,
+          schema: param.schema,
           value: generateNominalValue(param.schema),
-          isFinite: param.numberOfPossiableValues > 0 ? true : false,
+          isFinite: isFinite(param.schema),
         });
       }
     });
   }
 
-  if (operatrionObj.inputs.requestBody.length > 0) {
-    operatrionObj.inputs.requestBody.forEach((content) => {
-      chromosome.bodyContent.push(generateNominalValue(content.schema));
-    });
+  if (operatrionObj.inputs.requestBody) {
+    const properties = operatrionObj.inputs.requestBody.properties;
+    const requiredProperties =
+      operatrionObj.inputs.requestBody.requiredProperties;
+
+    for (let prop in properties) {
+      if (
+        requiredProperties.includes(prop.toString()) ||
+        generateRandomInt(1)
+      ) {
+        chromosome.properties.push({
+          name: prop.toString(),
+          schema: properties[prop],
+          value: generateNominalValue(properties[prop]),
+          isFinite: isFinite(properties[prop]),
+        });
+      }
+    }
   }
+
   return chromosome;
 };
 
@@ -34,9 +51,10 @@ const initializeFoodSource = (routeObj, routeKeys, size) => {
   let randomOperation;
   let genome;
 
-  const iterration = generateRandomInt(size, 1);
+  // generate random size for the population from min:1 to max:size
+  const randomStopCondition = generateRandomInt(size, 1);
 
-  for (let i = 0; i < iterration; i++) {
+  for (let i = 0; i < randomStopCondition; i++) {
     randomOperation = generateRandomInt(routeKeys.length - 1);
     genome = {
       operation: routeKeys[randomOperation],

@@ -57,8 +57,23 @@ const generateMutatedValue = (typeSchema) => {
   return '';
 };
 
+const extractNumberOfPossiableValues = (schemas) => {
+  let numberOfPossiableValues = 0;
+  schemas.forEach((schema) => {
+    numberOfPossiableValues +=
+      schema.type === 'boolean' ? 2 : schema.enum ? schema.enum.length : 0;
+  });
+  return numberOfPossiableValues;
+};
+
+const isFinite = (schema) => {
+  return schema.type === 'boolean' || schema.enum ? true : false;
+}
+
 module.exports = {
   generateNominalValue,
   generateMutatedValue,
   generateRandomInt,
+  extractNumberOfPossiableValues,
+  isFinite,
 };

@@ -32,7 +32,7 @@ const transformRoute = (route, path) => {
   const transformedRoute = {
     inputs: {
       parameters: [],
-      requestBody: [],
+      requestBody: null,
     },
     outputs: {},
     prefixingValue: prefixingValue,
@@ -66,12 +66,6 @@ const transformRoute = (route, path) => {
         in: param.in,
         required: param.required ? param.required : false,
         schema: param.schema,
-        numberOfPossiableValues:
-          param.schema.type === 'boolean'
-            ? 2
-            : param.schema.enum
-            ? param.schema.enum.length
-            : 0,
       };
 
       // add the param to the URI String (queryUri) --> if param of type query
@@ -96,18 +90,20 @@ const transformRoute = (route, path) => {
 
   // input: body content
   if (route.requestBody) {
-    const type = Object.keys(route.requestBody.content)[0];
-    const bodyContent = route.requestBody.content[type];
+    const contentType = Object.keys(route.requestBody.content);
+    const bodyContent = route.requestBody.content[contentType[0]];
 
     const bodyObj = {
-      bodyType: type,
+      contentType: contentType,
       // TODO: allof handle
-      // properties: [...Object.keys(bodyContent.schema.properties)],
-      schema: bodyContent.schema,
+      requiredProperties: bodyContent.schema.required
+        ? bodyContent.schema.required
+        : [],
+      properties: bodyContent.schema.properties,
       required: route.requestBody.required ? route.requestBody.required : false,
     };
 
-    transformedRoute['inputs'].requestBody.push(bodyObj);
+    transformedRoute['inputs'].requestBody = bodyObj;
   }
 
   // output: responses
@@ -144,7 +140,9 @@ exports.transformRoutes = async (req, res, next) => {
     // routesMap['/meals']['get'].outputs
     // routesMap['/meals']['post'].inputs.requestBody
     // routesMap['/weather'].get.inputs
-    // console.log(routesMap[Object.keys(routesMap)[0]]);
+    // console.log(
+    //   routesMap[Object.keys(routesMap)[0]].post.inputs.requestBody.properties
+    // );
 
     req.routes = routesMap;
 
