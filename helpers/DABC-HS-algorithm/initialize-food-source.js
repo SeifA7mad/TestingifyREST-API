@@ -10,8 +10,8 @@ const generateChromosome = (operatrionObj) => {
     properties: [],
   };
 
-  if (operatrionObj.inputs.parameters.length > 0) {
-    operatrionObj.inputs.parameters.forEach((param) => {
+  if (operatrionObj.parameters.length > 0) {
+    operatrionObj.parameters.forEach((param) => {
       if (param.required || generateRandomInt(1)) {
         chromosome.parameters.push({
           name: param.name,
@@ -23,10 +23,10 @@ const generateChromosome = (operatrionObj) => {
     });
   }
 
-  if (operatrionObj.inputs.requestBody) {
-    const properties = operatrionObj.inputs.requestBody.properties;
+  if (operatrionObj.requestBody) {
+    const properties = operatrionObj.requestBody.properties;
     const requiredProperties =
-      operatrionObj.inputs.requestBody.requiredProperties;
+      operatrionObj.requestBody.requiredProperties;
 
     for (let prop in properties) {
       if (

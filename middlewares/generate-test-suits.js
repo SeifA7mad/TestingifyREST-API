@@ -35,8 +35,8 @@ exports.generateTestSuits = (req, res, next) => {
     // loop to find the totalNumberOfInputs & totalNumberOfFiniteValues for every operation in this route
     routeKeys.forEach((key) => {
       // parameters & requestBody for each operation
-      const parameters = req.routes[route][key].inputs.parameters;
-      const requestBody = req.routes[route][key].inputs.requestBody;
+      const parameters = req.routes[route][key].parameters;
+      const requestBody = req.routes[route][key].requestBody;
 
       // total number of inputs (how many parameters + how many properties in body request)
       totalNumberOfInputs +=
@@ -63,13 +63,14 @@ exports.generateTestSuits = (req, res, next) => {
       maxPopulationSize,
     };
 
-    const initPopulation = initializeFoodSource(
+    // initialize the first population
+    const currentPopulation = initializeFoodSource(
       req.routes[route],
       routeKeys,
       maxPopulationSize
     );
 
-    const initPopulationFitnessValue = fitness(initPopulation, totalNumbers);
+    const initPopulationFitnessValue = fitness(currentPopulation, totalNumbers);
 
     // console.log(initPopulation, initPopulationFitnessValue);
   }

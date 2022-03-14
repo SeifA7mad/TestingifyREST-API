@@ -30,10 +30,8 @@ const transformRoute = (route, path) => {
   const prefixingValue = route.operationId ? route.operationId : pathName;
 
   const transformedRoute = {
-    inputs: {
-      parameters: [],
-      requestBody: null,
-    },
+    parameters: [],
+    requestBody: null,
     outputs: {},
     prefixingValue: prefixingValue,
     basicUri: path.toString(),
@@ -79,7 +77,7 @@ const transformRoute = (route, path) => {
         );
       }
 
-      transformedRoute['inputs'].parameters.push(paramObj);
+      transformedRoute.parameters.push(paramObj);
     });
 
     if (queryUri !== '') {
@@ -103,7 +101,7 @@ const transformRoute = (route, path) => {
       required: route.requestBody.required ? route.requestBody.required : false,
     };
 
-    transformedRoute['inputs'].requestBody = bodyObj;
+    transformedRoute.requestBody = bodyObj;
   }
 
   // output: responses
@@ -132,16 +130,16 @@ exports.transformRoutes = async (req, res, next) => {
       }
     }
 
-    // .post['/meals'].inputs.requestBody[0].content
-    // .get['/meals'].inputs.parameters[0].jsonSchema
-    // ['/maps/api/elevation/json']['get'].inputs.parameters
-    // ['/meals/{id}']['delete'].inputs.parameters
-    // console.log(routesMap['/meals']['get'].inputs.parameters);
+    // .post['/meals'].requestBody[0].content
+    // .get['/meals'].parameters[0].jsonSchema
+    // ['/maps/api/elevation/json']['get'].parameters
+    // ['/meals/{id}']['delete'].parameters
+    // console.log(routesMap['/meals']['get'].parameters);
     // routesMap['/meals']['get'].outputs
-    // routesMap['/meals']['post'].inputs.requestBody
-    // routesMap['/weather'].get.inputs
+    // routesMap['/meals']['post'].requestBody
+    // routesMap['/weather'].get
     // console.log(
-    //   routesMap[Object.keys(routesMap)[0]].post.inputs.requestBody.properties
+    //   routesMap[Object.keys(routesMap)[0]].post.requestBody.properties
     // );
 
     req.routes = routesMap;
