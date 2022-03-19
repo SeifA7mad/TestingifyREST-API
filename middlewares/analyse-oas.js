@@ -64,6 +64,7 @@ const transformRoute = (route, path) => {
         in: param.in,
         required: param.required ? param.required : false,
         schema: param.schema,
+        example: param.example ? param.example : null,
       };
 
       // add the param to the URI String (queryUri) --> if param of type query
@@ -97,7 +98,17 @@ const transformRoute = (route, path) => {
       requiredProperties: bodyContent.schema.required
         ? bodyContent.schema.required
         : [],
-      properties: bodyContent.schema.properties,
+      // reduce the properites obj to => Array({name, schema})
+      properties: Object.keys(bodyContent.schema.properties).reduce(
+        (res, key) => (
+          res.push({
+            name: key.toString(),
+            schema: bodyContent.schema.properties[key],
+          }),
+          res
+        ),
+        []
+      ),
       required: route.requestBody.required ? route.requestBody.required : false,
     };
 

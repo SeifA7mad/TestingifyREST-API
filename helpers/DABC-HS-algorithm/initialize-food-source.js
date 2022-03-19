@@ -1,4 +1,3 @@
-const { route } = require('express/lib/application');
 const {
   generateRandomInt,
   generateNominalValue,
@@ -18,7 +17,10 @@ const generateChromosome = (operatrionObj) => {
         chromosome.parameters.push({
           name: param.name,
           schema: param.schema,
-          value: generateNominalValue(param.schema),
+          value:
+            param.schema.type === 'string' && param.example
+              ? param.example
+              : generateNominalValue(param.schema),
           isFinite: isFinite(param.schema),
         });
       }
@@ -26,22 +28,18 @@ const generateChromosome = (operatrionObj) => {
   }
 
   if (operatrionObj.requestBody) {
-    const properties = operatrionObj.requestBody.properties;
     const requiredProperties = operatrionObj.requestBody.requiredProperties;
 
-    for (let prop in properties) {
-      if (
-        requiredProperties.includes(prop.toString()) ||
-        generateRandomInt(1)
-      ) {
+    operatrionObj.requestBody.properties.forEach((prop) => {
+      if (requiredProperties.includes(prop.name) || generateRandomInt(1)) {
         chromosome.properties.push({
-          name: prop.toString(),
-          schema: properties[prop],
-          value: generateNominalValue(properties[prop]),
-          isFinite: isFinite(properties[prop]),
+          name: prop.name,
+          schema: prop.schema,
+          value: generateNominalValue(prop.schema),
+          isFinite: isFinite(prop.schema),
         });
       }
-    }
+    });
   }
 
   return chromosome;
@@ -75,18 +73,14 @@ const initializeFoodSource = (routesObj) => {
     routeKeys.forEach((key) => {
       // parameters & requestBody for each operation
       const parameters = routesObj[route][key].parameters;
-      const requestBody = routesObj[route][key].requestBody;
+      const properties = routesObj[route][key].requestBody ? routesObj[route][key].requestBody.properties : [];
 
       // total number of inputs (how many parameters + how many properties in body request)
-      totalNumberOfInputs +=
-        parameters.length +
-        Object.keys(requestBody ? requestBody.properties : {}).length;
+      totalNumberOfInputs += parameters.length + properties.length;
 
       // map the parametrs & properties schemas into arrays to use it later
       const paramsSchemas = parameters.map((param) => param.schema);
-      const propSchemas = requestBody
-        ? Object.values(requestBody.properties)
-        : [];
+      const propSchemas = properties.map((prop) => prop.schema);
 
       // total number of finite values (extract the number of possiable values for finite type (boolean|enums)
       // from the two schema arrays
@@ -101,7 +95,8 @@ const initializeFoodSource = (routesObj) => {
       totalNumberOfFiniteValues,
       maxTestcaseSize,
     };
-    // generate random size for the population from min:1 to max:size
+
+    // generate random size for the Test Case from max:size to min:1
     const randomStopCondition = generateRandomInt(maxTestcaseSize, 1);
 
     const testCase = [];

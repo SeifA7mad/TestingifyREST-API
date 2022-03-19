@@ -47,7 +47,7 @@ exports.fitness = (chromosome, numbers) => {
   // check testcase size -> more is worst
   const chromosomeSizeCoverage = chromosome.length / numbers.maxTestcaseSize;
 
-  return (fitnessValue =
+  return +(fitnessValue =
     operationCoverage +
     parameterCoverage +
     inputValueCoverage +
