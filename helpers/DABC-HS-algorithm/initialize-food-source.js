@@ -17,6 +17,7 @@ const generateChromosome = (operatrionObj) => {
         chromosome.parameters.push({
           name: param.name,
           schema: param.schema,
+          required: param.required,
           value:
             param.schema.type === 'string' && param.example
               ? param.example
@@ -28,13 +29,12 @@ const generateChromosome = (operatrionObj) => {
   }
 
   if (operatrionObj.requestBody) {
-    const requiredProperties = operatrionObj.requestBody.requiredProperties;
-
     operatrionObj.requestBody.properties.forEach((prop) => {
-      if (requiredProperties.includes(prop.name) || generateRandomInt(1)) {
+      if (prop.required || generateRandomInt(1)) {
         chromosome.properties.push({
           name: prop.name,
           schema: prop.schema,
+          required: prop.required,
           value: generateNominalValue(prop.schema),
           isFinite: isFinite(prop.schema),
         });

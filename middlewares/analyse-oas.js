@@ -91,19 +91,23 @@ const transformRoute = (route, path) => {
   if (route.requestBody) {
     const contentType = Object.keys(route.requestBody.content);
     const bodyContent = route.requestBody.content[contentType[0]];
+    
+    const requiredProperties = bodyContent.schema.required
+      ? bodyContent.schema.required
+      : [];
 
     const bodyObj = {
       contentType: contentType,
       // TODO: allof handle
-      requiredProperties: bodyContent.schema.required
-        ? bodyContent.schema.required
-        : [],
       // reduce the properites obj to => Array({name, schema})
       properties: Object.keys(bodyContent.schema.properties).reduce(
         (res, key) => (
           res.push({
             name: key.toString(),
             schema: bodyContent.schema.properties[key],
+            required: requiredProperties.includes(key.toString())
+              ? true
+              : false,
           }),
           res
         ),

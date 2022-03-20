@@ -48,9 +48,9 @@ exports.fitness = (chromosome, numbers) => {
   const chromosomeSizeCoverage = chromosome.length / numbers.maxTestcaseSize;
 
   return +(fitnessValue =
-    operationCoverage +
+    (operationCoverage +
     parameterCoverage +
     inputValueCoverage +
-    statusCodeCoverage -
+    statusCodeCoverage) -
     chromosomeSizeCoverage);
 };
