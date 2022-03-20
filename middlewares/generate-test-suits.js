@@ -16,14 +16,14 @@ exports.generateTestSuits = (req, res, next) => {
   const currentPopulation = initializeFoodSource(req.routes);
   const populationKeys = Object.keys(currentPopulation);
 
-  // console.log(
-  //   // currentPopulation[populationKeys[0]]['testCase'],
-  //   '\n',
-  //   fitness(
-  //     currentPopulation[populationKeys[0]]['testCase'],
-  //     currentPopulation[populationKeys[0]]['numbers']
-  //   )
-  // );
+  console.log(
+    // currentPopulation[populationKeys[0]]['testCase'],
+    '\n',
+    fitness(
+      currentPopulation[populationKeys[0]]['testCase'],
+      currentPopulation[populationKeys[0]]['numbers']
+    )
+  );
 
   const newTestCase = mutation(
     currentPopulation[populationKeys[0]]['testCase'],
@@ -31,12 +31,12 @@ exports.generateTestSuits = (req, res, next) => {
     // 1 / currentPopulation[populationKeys[0]]['testCase'].length,
   );
 
-  // console.log('AFTER MUTATION');
-  // console.log(
-  //   // newTestCase,
-  //   '\n',
-  //   fitness(newTestCase, currentPopulation[populationKeys[0]]['numbers'])
-  // );
+  console.log('AFTER MUTATION');
+  console.log(
+    // newTestCase,
+    '\n',
+    fitness(newTestCase, currentPopulation[populationKeys[0]]['numbers'])
+  );
 
   // Employed bee Phase
   // for (let i = 0; i < populationSize; i++) {

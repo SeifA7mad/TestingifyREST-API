@@ -15,7 +15,7 @@ const errorMutationOperator = [
   'constraintViolation',
 ];
 
-const nominalMutation = (genome, operationInputs) => {
+const nominalMutation = (genome, operation) => {
   const newGenome = { ...genome };
 
   const editableMutationOperator = [...nominalMutationOperator];
@@ -24,69 +24,40 @@ const nominalMutation = (genome, operationInputs) => {
   const inputType = inputTypes[inputTypeChoice];
 
   // choose a random nominal mutation operator ['changeFinite', 'addNewInput', 'removeInput']
-  let mutationOperatorChoice;
+  let mutationOP;
 
   // loop: until there is at least one mutation operator is applied else remove the unappliable mutation operator from choices
-  loop: while (editableMutationOperator.length > 0) {
-    mutationOperatorChoice = generateRandomInt(
-      editableMutationOperator.length - 1
-    );
+  while (editableMutationOperator.length > 0) {
+    mutationOP =
+      nominalMutationOperator[
+        generateRandomInt(editableMutationOperator.length - 1)
+      ];
 
     // first: mutation operator => change a finite value to another value
-    if (nominalMutationOperator[mutationOperatorChoice] === 'changeFinite') {
-      const newInputs = changeFiniteValue(genome[inputType]);
-      if (!newInputs) {
-        editableMutationOperator.splice(
-          editableMutationOperator.indexOf('changeFinite'),
-          1
-        );
-        continue loop;
-        // return newGenome;
-      }
-      newGenome[inputType] = newInputs;
-      return newGenome;
-    }
-
     // second: mutation operator => add new input either to parameters or to properties (new input must be distict)
-    if (nominalMutationOperator[mutationOperatorChoice] === 'addNewInput') {
-      const newInputs = addNewInput(
-        genome[inputType],
-        inputType === 'properties' && operation.requestBody
-          ? operation.requestBody.properties
-          : inputType === 'parameters'
-          ? operation.parameters
-          : []
-      );
-
-      if (!newInputs) {
-        editableMutationOperator.splice(
-          editableMutationOperator.indexOf('addNewInput'),
-          1
-        );
-        continue loop;
-        // return newGenome;
-      }
-
-      newGenome[inputType] = newInputs;
-
-      return newGenome;
-    }
-
     // third: mutation operator => remove a non required input
-    if (nominalMutationOperator[mutationOperatorChoice] === 'removeInput') {
-      const newInputs = removeInput(genome[inputType]);
-
-      if (!newInputs) {
-        editableMutationOperator.splice(
-          editableMutationOperator.indexOf('removeInput'),
-          1
-        );
-        continue loop;
-        // return newGenome;
-      }
-      newGenome[inputType] = newInputs;
-      return newGenome;
+    const newInputs =
+      mutationOP === 'changeFinite'
+        ? changeFiniteValue(genome[inputType])
+        : mutationOP === 'addNewInput'
+        ? addNewInput(
+            genome[inputType],
+            inputType === 'properties' && operation.requestBody
+              ? operation.requestBody.properties
+              : inputType === 'parameters'
+              ? operation.parameters
+              : []
+          )
+        : removeInput(genome[inputType]);
+    if (!newInputs) {
+      editableMutationOperator.splice(
+        editableMutationOperator.indexOf(mutationOP),
+        1
+      );
+      continue;
     }
+    newGenome[inputType] = newInputs;
+    return newGenome;
   }
 
   return newGenome;

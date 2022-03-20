@@ -57,7 +57,7 @@ exports.addNewInput = (inputs, operationInputs) => {
   }
 
   // choose a random input from newInputsToBeAdded to add it into inputs
-  const randomNewInputChoice = generateRandomInt(newInputs.length - 1);
+  const randomNewInputChoice = generateRandomInt(newInputsToBeAdded.length - 1);
 
   // add a new input object into newInputs
   newInputs.push({
