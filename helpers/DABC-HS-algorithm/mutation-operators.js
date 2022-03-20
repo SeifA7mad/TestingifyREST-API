@@ -72,7 +72,7 @@ exports.addNewInput = (inputs, operationInputs) => {
   return newInputs;
 };
 
-exports.removeInput = (inputs) => {
+exports.removeNonRequiredInput = (inputs) => {
   // copy the inputs to edit it later
   const newInputs = [...inputs];
 
@@ -87,11 +87,34 @@ exports.removeInput = (inputs) => {
   }
 
   // choose a random non-required input index to remove it
-  const randomnonRequiredInputIndex =
+  const randomNonRequiredInputIndex =
     nonRequiredInputsIndex[
       generateRandomInt(nonRequiredInputsIndex.length - 1)
     ];
-  newInputs.splice(randomnonRequiredInputIndex, 1);
+  newInputs.splice(randomNonRequiredInputIndex, 1);
 
   return newInputs;
+};
+
+exports.removeRequiredInput = (inputs) => {
+  // copy the inputs to edit it later
+  const newInputs = [...inputs];
+
+  // map only non-required inputs (required = false) then filter the undefined values keeping only the non-required inputs indexes
+  const requiredInputsIndex = inputs
+    .map((input, index) => (input.required ? index : undefined))
+    .filter((input) => input !== undefined);
+
+  // if all the inputs is required => null
+  if (requiredInputsIndex.length <= 0) {
+    return null;
+  }
+
+  // choose a random non-required input index to remove it
+  const randomRequiredInputIndex =
+    nonRequiredInputsIndex[generateRandomInt(requiredInputsIndex.length - 1)];
+  const mutationApplied = `The mutation operation removed a required input: ${newInputs[randomRequiredInputIndex].name}`;
+  newInputs.splice(randomRequiredInputIndex, 1);
+
+  return { inputs: newInputs, mutationApplied};
 };

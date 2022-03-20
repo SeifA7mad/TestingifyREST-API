@@ -1,3 +1,3 @@
 exports.postTestApi = (req, res, next) => {
-    res.send('OK');
+  res.status(200).json('OK');
 };

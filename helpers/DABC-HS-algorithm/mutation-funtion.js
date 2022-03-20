@@ -3,7 +3,8 @@ const { generateRandomInt } = require('../generate-values');
 const {
   changeFiniteValue,
   addNewInput,
-  removeInput,
+  removeNonRequiredInput,
+  removeRequiredInput,
 } = require('./mutation-operators');
 
 const mutationType = ['nominalTesting', 'mutationTesting'];
@@ -15,13 +16,10 @@ const errorMutationOperator = [
   'constraintViolation',
 ];
 
-const nominalMutation = (genome, operation) => {
+const nominalMutation = (genome, operationInputs, inputType) => {
   const newGenome = { ...genome };
 
   const editableMutationOperator = [...nominalMutationOperator];
-  // choose wether to mutate parameters or properties
-  const inputTypeChoice = generateRandomInt(1);
-  const inputType = inputTypes[inputTypeChoice];
 
   // choose a random nominal mutation operator ['changeFinite', 'addNewInput', 'removeInput']
   let mutationOP;
@@ -33,22 +31,15 @@ const nominalMutation = (genome, operation) => {
         generateRandomInt(editableMutationOperator.length - 1)
       ];
 
-    // first: mutation operator => change a finite value to another value
-    // second: mutation operator => add new input either to parameters or to properties (new input must be distict)
-    // third: mutation operator => remove a non required input
+    // if mutationOP === 'changeFinite' =(first: mutation operator)> change a finite value to another value
+    // if mutationOP === 'addNewInput' =(second: mutation operator)> add new input either to parameters or to properties (new input must be distict)
+    // if mutationOP === 'removeInput' =(third: mutation operator)> remove a random non required input
     const newInputs =
       mutationOP === 'changeFinite'
         ? changeFiniteValue(genome[inputType])
         : mutationOP === 'addNewInput'
-        ? addNewInput(
-            genome[inputType],
-            inputType === 'properties' && operation.requestBody
-              ? operation.requestBody.properties
-              : inputType === 'parameters'
-              ? operation.parameters
-              : []
-          )
-        : removeInput(genome[inputType]);
+        ? addNewInput(genome[inputType], operationInputs)
+        : removeNonRequiredInput(genome[inputType]);
     if (!newInputs) {
       editableMutationOperator.splice(
         editableMutationOperator.indexOf(mutationOP),
@@ -63,11 +54,49 @@ const nominalMutation = (genome, operation) => {
   return newGenome;
 };
 
-const errorMutation = (genome, operationInputs) => {};
+const errorMutation = (genome, operationInputs, inputType) => {
+  const newGenome = { ...genome };
+
+  const editableMutationOperator = [...errorMutationOperator];
+
+  while (editableMutationOperator.length > 0) {
+    mutationOP =
+      errorMutationOperator[
+        generateRandomInt(editableMutationOperator.length - 1)
+      ];
+
+    // if mutationOP === 'missingRequired' =(first: mutation operator)> remove a random required input
+    // if mutationOP === 'wrongInputType' =(second: mutation operator)> add new input either to parameters or to properties (new input must be distict)
+    // if mutationOP === 'constraintViolation' =(third: mutation operator)> remove a non required input
+    const newInputs =
+      mutationOP === 'missingRequired'
+        ? removeRequiredInput(genome[inputType])
+        : mutationOP === 'wrongInputType'
+        ? null
+        : null;
+
+    if (!newInputs) {
+      editableMutationOperator.splice(
+        editableMutationOperator.indexOf(mutationOP),
+        1
+      );
+      continue;
+    }
+    newGenome[inputType] = newInputs.inputs;
+    newGenome['testType'] = 'mutation';
+    newGenome['mutationApplied'] = `${newInputs.mutationApplied} from ${inputType}`;
+
+    return newGenome;
+  }
+
+  return newGenome;
+};
 
 exports.mutation = (chromosome, routeObj, MR = 0.5) => {
-  const newChromosome = chromosome;
+  const newChromosome = [...chromosome];
   let mutationTypeChoice;
+  let inputType;
+  let operationInput;
 
   // loop on every Genome in the Test Case chromosome
   for (let i = 0; i < chromosome.length; i++) {
@@ -79,6 +108,26 @@ exports.mutation = (chromosome, routeObj, MR = 0.5) => {
     // choose random mutation type => (nominal testing or mutation testing)
     mutationTypeChoice = generateRandomInt(mutationType.length - 1);
 
+    // choose wether to mutate parameters or properties
+    // if the original operation contains params & props => choose random one to work on
+    // only params => choose params (by default)
+    // only props => choose props (by default)
+    // routeObj[chromosome[i].operation] =(standsfor)> access the current original operation from route object by the current operation name from the chromosome
+    inputType =
+      inputTypes[
+        routeObj[chromosome[i].operation].parameters.length > 0 &&
+        routeObj[chromosome[i].operation].requestBody > 0
+          ? generateRandomInt(inputTypes.length - 1)
+          : routeObj[chromosome[i].operation].parameters.length > 0
+          ? 0
+          : 1
+      ];
+
+    operationInput =
+      inputType === 'properties'
+        ? routeObj[chromosome[i].operation].requestBody.properties
+        : routeObj[chromosome[i].operation].parameters;
+
     // if mutation type == 'nominal testing' the test case (chromosome) must be of type nominal to be able to perform nominal mutation
     if (
       (mutationType[mutationTypeChoice] === 'nominalTesting' &&
@@ -87,7 +136,8 @@ exports.mutation = (chromosome, routeObj, MR = 0.5) => {
     ) {
       newChromosome[i] = nominalMutation(
         chromosome[i],
-        routeObj[chromosome[i].operation]
+        operationInput,
+        inputType
       );
     } else {
       //   newChromosome[i] = errorMutation(

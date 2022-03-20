@@ -17,7 +17,7 @@ exports.generateTestSuits = (req, res, next) => {
   const populationKeys = Object.keys(currentPopulation);
 
   console.log(
-    // currentPopulation[populationKeys[0]]['testCase'],
+    currentPopulation[populationKeys[0]]['testCase'],
     '\n',
     fitness(
       currentPopulation[populationKeys[0]]['testCase'],
@@ -33,7 +33,7 @@ exports.generateTestSuits = (req, res, next) => {
 
   console.log('AFTER MUTATION');
   console.log(
-    // newTestCase,
+    newTestCase,
     '\n',
     fitness(newTestCase, currentPopulation[populationKeys[0]]['numbers'])
   );
