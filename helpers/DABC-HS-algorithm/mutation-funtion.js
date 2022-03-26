@@ -66,7 +66,7 @@ const errorMutation = (genome, operationInputs, inputType) => {
       ];
 
     // if mutationOP === 'missingRequired' =(first: mutation operator)> remove a random required input
-    // if mutationOP === 'wrongInputType' =(second: mutation operator)> add new input either to parameters or to properties (new input must be distict)
+    // if mutationOP === 'wrongInputType' =(second: mutation operator)>
     // if mutationOP === 'constraintViolation' =(third: mutation operator)> remove a non required input
     const newInputs =
       mutationOP === 'missingRequired'
