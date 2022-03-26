@@ -27,7 +27,7 @@ const nominalMutation = (genome, operationInputs, inputType) => {
   // loop: until there is at least one mutation operator is applied else remove the unappliable mutation operator from choices
   while (editableMutationOperator.length > 0) {
     mutationOP =
-      nominalMutationOperator[
+      editableMutationOperator[
         generateRandomInt(editableMutationOperator.length - 1)
       ];
 
@@ -60,10 +60,8 @@ const errorMutation = (genome, operationInputs, inputType) => {
   const editableMutationOperator = [...errorMutationOperator];
 
   while (editableMutationOperator.length > 0) {
-    mutationOP =
-      errorMutationOperator[
-        generateRandomInt(editableMutationOperator.length - 1)
-      ];
+    mutationOP = editableMutationOperator[0];
+    // generateRandomInt(editableMutationOperator.length - 1)
 
     // if mutationOP === 'missingRequired' =(first: mutation operator)> remove a random required input
     // if mutationOP === 'wrongInputType' =(second: mutation operator)>
@@ -84,7 +82,8 @@ const errorMutation = (genome, operationInputs, inputType) => {
     }
     newGenome[inputType] = newInputs.inputs;
     newGenome['testType'] = 'mutation';
-    newGenome['mutationApplied'] = `${newInputs.mutationApplied} from ${inputType}`;
+    !newGenome['mutationApplied'] ? newGenome['mutationApplied'] = [] : null 
+    newGenome['mutationApplied'].push(`${newInputs.mutationApplied} from ${inputType}`);
 
     return newGenome;
   }
@@ -107,7 +106,6 @@ exports.mutation = (chromosome, routeObj, MR = 0.5) => {
 
     // choose random mutation type => (nominal testing or mutation testing)
     mutationTypeChoice = generateRandomInt(mutationType.length - 1);
-
     // choose wether to mutate parameters or properties
     // if the original operation contains params & props => choose random one to work on
     // only params => choose params (by default)
@@ -130,9 +128,8 @@ exports.mutation = (chromosome, routeObj, MR = 0.5) => {
 
     // if mutation type == 'nominal testing' the test case (chromosome) must be of type nominal to be able to perform nominal mutation
     if (
-      (mutationType[mutationTypeChoice] === 'nominalTesting' &&
-        chromosome[i].testingType === 'nominal') ||
-      true
+      mutationType[mutationTypeChoice] === 'nominalTesting' &&
+      chromosome[i].testingType === 'nominal'
     ) {
       newChromosome[i] = nominalMutation(
         chromosome[i],
@@ -140,10 +137,11 @@ exports.mutation = (chromosome, routeObj, MR = 0.5) => {
         inputType
       );
     } else {
-      //   newChromosome[i] = errorMutation(
-      //     chromosome[i],
-      //     routeObj[chromosome[i].operation].inputs
-      //   );
+      newChromosome[i] = errorMutation(
+        chromosome[i],
+        operationInput,
+        inputType
+      );
     }
   }
 

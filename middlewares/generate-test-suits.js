@@ -16,7 +16,7 @@ exports.generateTestSuits = (req, res, next) => {
   const currentPopulation = initializeFoodSource(req.routes);
   const populationKeys = Object.keys(currentPopulation);
 
-  console.log('Sample TEST SUITE');
+  console.log('Sample TEST CASE');
   console.log(
     currentPopulation[populationKeys[0]]['testCase'],
     '\n',
@@ -32,7 +32,7 @@ exports.generateTestSuits = (req, res, next) => {
     // 1 / currentPopulation[populationKeys[0]]['testCase'].length,
   );
 
-  console.log('Sample TEST SUITE AFTER MUTATION');
+  console.log('Sample TEST CASE AFTER MUTATION');
   console.log(
     newTestCase,
     '\n',

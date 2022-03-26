@@ -112,8 +112,8 @@ exports.removeRequiredInput = (inputs) => {
 
   // choose a random non-required input index to remove it
   const randomRequiredInputIndex =
-    nonRequiredInputsIndex[generateRandomInt(requiredInputsIndex.length - 1)];
-  const mutationApplied = `The mutation operation removed a required input: ${newInputs[randomRequiredInputIndex].name}`;
+    requiredInputsIndex[generateRandomInt(requiredInputsIndex.length - 1)];
+  const mutationApplied = `The mutation operation removed a required input: (${newInputs[randomRequiredInputIndex].name})`;
   newInputs.splice(randomRequiredInputIndex, 1);
 
   return { inputs: newInputs, mutationApplied};
