@@ -38,7 +38,7 @@ exports.fitness = (chromosome, numbers) => {
   // total number of expected status code: number of distinct operation in testcase * 2
   const totalNumberOfExpectedStatusCode = numberOfOperations * 2;
   const numberOfExpectedStatusCode = new Set(
-    chromosome.map((ch) => ch.operation + ch.testType)
+    chromosome.map((ch) => ch.operation + ch.expectedStatuscode)
   ).size;
 
   const statusCodeCoverage =

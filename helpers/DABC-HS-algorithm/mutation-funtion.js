@@ -82,8 +82,12 @@ const errorMutation = (genome, operationInputs, inputType) => {
     }
     newGenome[inputType] = newInputs.inputs;
     newGenome['testType'] = 'mutation';
-    !newGenome['mutationApplied'] ? newGenome['mutationApplied'] = [] : null 
-    newGenome['mutationApplied'].push(`${newInputs.mutationApplied} from ${inputType}`);
+    mutationOP === 'missingRequired'
+      ? (newGenome['expectedStatuscode'] = 400)
+      : (newGenome['expectedStatuscode'] = 500);
+
+    // !newGenome['mutationApplied'] ? newGenome['mutationApplied'] = [] : null 
+    newGenome['mutationApplied'] = `${newInputs.mutationApplied} from ${inputType}`;
 
     return newGenome;
   }
@@ -136,7 +140,10 @@ exports.mutation = (chromosome, routeObj, MR = 0.5) => {
         operationInput,
         inputType
       );
-    } else {
+    } else if (
+      mutationType[mutationTypeChoice] === 'mutationTesting' &&
+      chromosome[i].testingType === 'nominal'
+    ) {
       newChromosome[i] = errorMutation(
         chromosome[i],
         operationInput,

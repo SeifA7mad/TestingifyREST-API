@@ -65,9 +65,9 @@ const initializeFoodSource = (routesObj) => {
     totalNumberOfInputs = 0;
     totalNumberOfFiniteValues = 0;
     // each route -> 5 diff operatrion
-    // each operation -> 2 diff stutas code '2xx, (4xx, 5xx)'
-    // (5 * 2)  = 10
-    maxTestcaseSize = 5 * 2;
+    // each operation -> 3 diff stutas code '2xx, 4xx, 5xx'
+    // (5 * 3)  = 15
+    maxTestcaseSize = 5 * 3;
 
     // loop to find the totalNumberOfInputs & totalNumberOfFiniteValues for every operation in this route
     routeKeys.forEach((key) => {
@@ -106,6 +106,7 @@ const initializeFoodSource = (routesObj) => {
       genome = {
         operation: routeKeys[randomOperation],
         testType: 'nominal',
+        expectedStatuscode: 200,
         ...generateChromosome(routesObj[route][routeKeys[randomOperation]]),
       };
       testCase.push(genome);

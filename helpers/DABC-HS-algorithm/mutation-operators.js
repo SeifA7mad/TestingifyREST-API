@@ -1,6 +1,7 @@
 const {
   generateRandomInt,
   generateNominalValue,
+  generateMutatedValue,
   isFinite,
 } = require('../generate-values');
 
@@ -116,5 +117,41 @@ exports.removeRequiredInput = (inputs) => {
   const mutationApplied = `The mutation operation removed a required input: (${newInputs[randomRequiredInputIndex].name})`;
   newInputs.splice(randomRequiredInputIndex, 1);
 
-  return { inputs: newInputs, mutationApplied};
+  return { inputs: newInputs, mutationApplied };
+};
+
+exports.mutateInputType = (inputs) => {
+  // copy the inputs to edit it later
+  const newInputs = [...inputs];
+
+  const filteredInputsIndex = inputs
+    .map((input, index) => {
+      if (
+        input.schema.type === 'string' ||
+        input.schema.type === 'number' ||
+        input.schema.type === 'integer' ||
+        input.schema.enum
+      ) {
+        return index;
+      }
+      return undefined;
+    })
+    .filter((input) => input !== undefined);
+
+  if (filteredInputsIndex.length <= 0) {
+    return null;
+  }
+
+  const randomFilteredInputIndex =
+    filteredInputsIndex[generateRandomInt(filteredInputsIndex.length - 1)];
+
+  const oldValue = newInputs[randomFilteredInputIndex].value;
+
+  newInputs[randomFilteredInputIndex].value = generateMutatedValue(
+    newInputs[randomFilteredInputIndex].schema
+  );
+
+  const mutationApplied = `The mutation operation mutated the input (${newInputs[randomFilteredInputIndex].name}) value from ${oldValue} to ${newInputs[randomFilteredInputIndex].value}`;
+
+  return { inputs: newInputs, mutationApplied };
 };

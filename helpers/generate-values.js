@@ -54,7 +54,18 @@ const generateNominalValue = (typeSchema) => {
 };
 
 const generateMutatedValue = (typeSchema) => {
-  return '';
+  if (typeSchema.type === 'string' && !typeSchema.enum) {
+    return generateRandomInt(50, 1);
+  }
+
+  if (
+    typeSchema.type === 'number' ||
+    typeSchema.type === 'integer' ||
+    typeSchema.enum
+  ) {
+    return crypto.randomBytes(generateRandomInt(20, 5)).toString('hex');
+  }
+  return null;
 };
 
 const extractNumberOfPossiableValues = (schemas) => {
@@ -68,7 +79,7 @@ const extractNumberOfPossiableValues = (schemas) => {
 
 const isFinite = (schema) => {
   return schema.type === 'boolean' || schema.enum ? true : false;
-}
+};
 
 module.exports = {
   generateNominalValue,
