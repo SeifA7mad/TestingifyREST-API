@@ -124,6 +124,7 @@ exports.mutateInputType = (inputs) => {
   // copy the inputs to edit it later
   const newInputs = [...inputs];
 
+  // map&filter only string or number or integer or enum inputs and save thier indexes
   const filteredInputsIndex = inputs
     .map((input, index) => {
       if (
