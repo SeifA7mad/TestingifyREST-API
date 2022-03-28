@@ -2,6 +2,7 @@ const {
   generateRandomInt,
   generateNominalValue,
   generateMutatedValue,
+  generateViolationValue,
   isFinite,
 } = require('../generate-values');
 
@@ -152,7 +153,42 @@ exports.mutateInputType = (inputs) => {
     newInputs[randomFilteredInputIndex].schema
   );
 
-  const mutationApplied = `The mutation operation mutated the input (${newInputs[randomFilteredInputIndex].name}) value from ${oldValue} to ${newInputs[randomFilteredInputIndex].value}`;
+  const mutationApplied = `The mutation operation mutated the input (${newInputs[randomFilteredInputIndex].name}) value from "${oldValue}" to "${newInputs[randomFilteredInputIndex].value}"`;
+
+  return { inputs: newInputs, mutationApplied };
+};
+
+exports.constraintViolation = (inputs) => {
+  // copy the inputs to edit it later
+  const newInputs = [...inputs];
+
+  const filteredInputsIndex = inputs
+    .map((input, index) => {
+      if (
+        input.schema.minLength ||
+        input.schema.maxLength ||
+        input.schema.maximum ||
+        input.schema.minimum
+      ) {
+        return index;
+      }
+      return undefined;
+    })
+    .filter((input) => input !== undefined);
+
+  if (filteredInputsIndex.length <= 0) {
+    return null;
+  }
+
+  const randomFilteredInputIndex =
+    filteredInputsIndex[generateRandomInt(filteredInputsIndex.length - 1)];
+
+  const oldValue = newInputs[randomFilteredInputIndex].value;
+  newInputs[randomFilteredInputIndex].value = generateViolationValue(
+    newInputs[randomFilteredInputIndex].schema
+  );
+
+  const mutationApplied = `The mutation operation violated the input (${newInputs[randomFilteredInputIndex].name}) value from "${oldValue}" to "${newInputs[randomFilteredInputIndex].value}"`;
 
   return { inputs: newInputs, mutationApplied };
 };

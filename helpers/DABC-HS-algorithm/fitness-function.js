@@ -38,7 +38,7 @@ exports.fitness = (chromosome, numbers) => {
   // total number of expected status code: number of distinct operation in testcase * 2
   const totalNumberOfExpectedStatusCode = numberOfOperations * 2;
   const numberOfExpectedStatusCode = new Set(
-    chromosome.map((ch) => ch.operation + ch.expectedStatuscode)
+    chromosome.map((ch) => ch.operation + ch.testType)
   ).size;
 
   const statusCodeCoverage =
@@ -47,10 +47,22 @@ exports.fitness = (chromosome, numbers) => {
   // check testcase size -> more is worst
   const chromosomeSizeCoverage = chromosome.length / numbers.maxTestcaseSize;
 
+  // check Mutated Paramters Coverage
+  // by: dividing number of overall mutated inputs used in testcase / total expected number of mutated inputs
+  // only in mutation test cases type
+  // STILL IN TESTING........................................ 
+  // const numberOfMutatedInputs = Math.max(
+  //   ...chromosome.map((ch) =>
+  //     ch.testType === 'mutation' ? ch.mutationApplied.length : 0
+  //   )
+  // );
+  // const mutatedParameterCoverage =
+  //   numberOfMutatedInputs / numbers.totalNumberOfInputs;
+
   return +(fitnessValue =
-    (operationCoverage +
+    operationCoverage +
     parameterCoverage +
     inputValueCoverage +
-    statusCodeCoverage) -
+    statusCodeCoverage -
     chromosomeSizeCoverage);
 };

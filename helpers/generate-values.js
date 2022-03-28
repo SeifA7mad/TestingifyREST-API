@@ -68,6 +68,22 @@ const generateMutatedValue = (typeSchema) => {
   return null;
 };
 
+const generateViolationValue = (typeSchema) => {
+  if (typeSchema.type === 'string') {
+    return crypto
+      .randomBytes(typeSchema.maxLength + Math.pow(2, typeSchema.maxLength))
+      .toString('hex');
+  }
+
+  if (typeSchema.type === 'number' || typeSchema.type === 'integer') {
+    return generateRandomInt(
+      typeSchema.maximum + Math.pow(2, typeSchema.minimum)
+    );
+  }
+
+  return null;
+};
+
 const extractNumberOfPossiableValues = (schemas) => {
   let numberOfPossiableValues = 0;
   schemas.forEach((schema) => {
@@ -86,5 +102,6 @@ module.exports = {
   generateMutatedValue,
   generateRandomInt,
   extractNumberOfPossiableValues,
+  generateViolationValue,
   isFinite,
 };

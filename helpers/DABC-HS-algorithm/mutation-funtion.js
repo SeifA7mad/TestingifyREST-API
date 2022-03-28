@@ -6,6 +6,7 @@ const {
   removeNonRequiredInput,
   removeRequiredInput,
   mutateInputType,
+  constraintViolation,
 } = require('./mutation-operators');
 
 const mutationType = ['nominalTesting', 'mutationTesting'];
@@ -68,13 +69,13 @@ const errorMutation = (genome, inputType) => {
 
     // if mutationOP === 'missingRequired' =(first: mutation operator)> remove a random required input
     // if mutationOP === 'wrongInputType' =(second: mutation operator)>
-    // if mutationOP === 'constraintViolation' =(third: mutation operator)> remove a non required input
+    // if mutationOP === 'constraintViolation' =(third: mutation operator)>
     const newInputs =
       mutationOP === 'missingRequired'
         ? removeRequiredInput(genome[inputType])
         : mutationOP === 'wrongInputType'
         ? mutateInputType(genome[inputType])
-        : null;
+        : constraintViolation(genome[inputType]);
 
     if (!newInputs) {
       editableMutationOperator.splice(
@@ -85,14 +86,14 @@ const errorMutation = (genome, inputType) => {
     }
     newGenome[inputType] = newInputs.inputs;
     newGenome['testType'] = 'mutation';
-    mutationOP === 'missingRequired'
-      ? (newGenome['expectedStatuscode'] = 400)
-      : (newGenome['expectedStatuscode'] = 500);
+    // mutationOP === 'missingRequired'
+    //   ? (newGenome['expectedStatuscode'] = 400)
+    //   : (newGenome['expectedStatuscode'] = 500);
 
-    // !newGenome['mutationApplied'] ? newGenome['mutationApplied'] = [] : null
-    newGenome[
-      'mutationApplied'
-    ] = `${newInputs.mutationApplied} from ${inputType}`;
+    !newGenome['mutationApplied'] ? (newGenome['mutationApplied'] = []) : null;
+    newGenome['mutationApplied'].push(
+      `${newInputs.mutationApplied} from ${inputType}`
+    );
 
     return newGenome;
   }
@@ -146,10 +147,7 @@ exports.mutation = (chromosome, routeObj, MR = 0.5) => {
         operationInput,
         inputType
       );
-    } else if (
-      mutationType[mutationTypeChoice] === 'mutationTesting' &&
-      chromosome[i].testType === 'nominal'
-    ) {
+    } else {
       newChromosome[i] = errorMutation(chromosome[i], inputType);
     }
   }
