@@ -91,9 +91,7 @@ const errorMutation = (genome, inputType) => {
     //   : (newGenome['expectedStatuscode'] = 500);
 
     !newGenome['mutationApplied'] ? (newGenome['mutationApplied'] = []) : null;
-    newGenome['mutationApplied'].push(
-      `${newInputs.mutationApplied} from ${inputType}`
-    );
+    newGenome['mutationApplied'].push(newInputs.mutationApplied);
 
     return newGenome;
   }

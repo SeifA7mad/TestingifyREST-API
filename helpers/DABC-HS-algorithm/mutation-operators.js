@@ -118,7 +118,10 @@ exports.removeRequiredInput = (inputs) => {
   // choose a random non-required input index to remove it
   const randomRequiredInputIndex =
     requiredInputsIndex[generateRandomInt(requiredInputsIndex.length - 1)];
-  const mutationApplied = `The mutation operation removed a required input: (${newInputs[randomRequiredInputIndex].name})`;
+  const mutationApplied = {
+    inputName: newInputs[randomRequiredInputIndex].name,
+    txt: `The mutation operation removed a required input`,
+  };
   newInputs.splice(randomRequiredInputIndex, 1);
 
   return { inputs: newInputs, mutationApplied };
@@ -156,7 +159,10 @@ exports.mutateInputType = (inputs) => {
     newInputs[randomFilteredInputIndex].schema
   );
 
-  const mutationApplied = `The mutation operation mutated the input (${newInputs[randomFilteredInputIndex].name}) value from "${oldValue}" to "${newInputs[randomFilteredInputIndex].value}"`;
+  const mutationApplied = {
+    inputName: newInputs[randomFilteredInputIndex].name,
+    txt: `The mutation operation mutated the input value from "${oldValue}" to "${newInputs[randomFilteredInputIndex].value}"`,
+  };
 
   return { inputs: newInputs, mutationApplied };
 };
@@ -191,7 +197,10 @@ exports.constraintViolation = (inputs) => {
     newInputs[randomFilteredInputIndex].schema
   );
 
-  const mutationApplied = `The mutation operation violated the input (${newInputs[randomFilteredInputIndex].name}) value from "${oldValue}" to "${newInputs[randomFilteredInputIndex].value}"`;
+  const mutationApplied = {
+    inputName: newInputs[randomFilteredInputIndex].name,
+    txt: `The mutation operation violated the input value from "${oldValue}" to "${newInputs[randomFilteredInputIndex].value}"`,
+  };
 
   return { inputs: newInputs, mutationApplied };
 };
