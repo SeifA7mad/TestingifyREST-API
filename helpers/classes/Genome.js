@@ -1,4 +1,4 @@
-module.exports = class TestcaseInput {
+module.exports = class Genome {
     constructor(name, schema, required, value, isFinite) {
         this.name = name;
         this.schema = schema;

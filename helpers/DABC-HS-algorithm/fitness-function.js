@@ -39,7 +39,7 @@ exports.fitness = (chromosome, numbers) => {
   const totalNumberOfExpectedStatusCode = numberOfOperations * 2;
   const numberOfExpectedStatusCode = new Set(
     chromosome.map((ch) => ch.operation + ch.testType)
-  ).size;
+  ).size; 
 
   const statusCodeCoverage =
     numberOfExpectedStatusCode / totalNumberOfExpectedStatusCode;
@@ -51,21 +51,20 @@ exports.fitness = (chromosome, numbers) => {
   // by: dividing number of overall mutated inputs used in testcase / total expected number of mutated inputs
   // only in mutation test cases type
   // STILL IN TESTING........................................
-  const numberOfMutatedSet = new Set();
-  chromosome.forEach(ch => {
-    if (ch.testType === 'mutation') {
-      numberOfMutatedSet.add(...ch.mutationApplied.map((ma) => ma.inputName));
-    }
-  });
-  const numberOfMutatedInputs = numberOfMutatedSet.size;
-  const mutatedParameterCoverage =
-    numberOfMutatedInputs / numbers.totalNumberOfInputs;
+  // const numberOfMutatedSet = new Set();
+  // chromosome.forEach(ch => {
+  //   if (ch.testType === 'mutation') {
+  //     numberOfMutatedSet.add(...ch.mutationApplied.map((ma) => ma.inputName));
+  //   }
+  // });
+  // const numberOfMutatedInputs = numberOfMutatedSet.size;
+  // const mutatedParameterCoverage =
+  //   numberOfMutatedInputs / numbers.totalNumberOfInputs;
 
   return +(fitnessValue =
     operationCoverage +
     parameterCoverage +
     inputValueCoverage +
-    mutatedParameterCoverage +
     statusCodeCoverage -
     chromosomeSizeCoverage).toFixed(4);
 };

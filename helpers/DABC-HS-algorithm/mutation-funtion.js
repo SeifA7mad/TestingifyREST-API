@@ -89,8 +89,6 @@ const errorMutation = (genome, inputType) => {
     // mutationOP === 'missingRequired'
     //   ? (newGenome['expectedStatuscode'] = 400)
     //   : (newGenome['expectedStatuscode'] = 500);
-
-    !newGenome['mutationApplied'] ? (newGenome['mutationApplied'] = []) : null;
     newGenome['mutationApplied'].push(newInputs.mutationApplied);
 
     return newGenome;

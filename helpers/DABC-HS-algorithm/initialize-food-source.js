@@ -5,19 +5,18 @@ const {
   extractNumberOfPossiableValues,
 } = require('../generate-values');
 
-const TestcaseInput = require('../classes/TestcaseInput');
+const Genome = require('../classes/Genome');
+const Chromosome = require('../classes/Chromosome');
 
-const generateChromosome = (operatrionObj) => {
-  const chromosome = {
-    parameters: [],
-    properties: [],
-  };
+const generateChromosome = (operationName, testType, operatrionObj) => {
+  const parameters = [];
+  const properties = [];
 
   if (operatrionObj.parameters.length > 0) {
     operatrionObj.parameters.forEach((param) => {
       if (param.required || generateRandomInt(1)) {
-        chromosome.parameters.push(
-          new TestcaseInput(
+        parameters.push(
+          new Genome(
             param.name,
             param.schema,
             param.required,
@@ -34,8 +33,8 @@ const generateChromosome = (operatrionObj) => {
   if (operatrionObj.requestBody) {
     operatrionObj.requestBody.properties.forEach((prop) => {
       if (prop.required || generateRandomInt(1)) {
-        chromosome.properties.push(
-          new TestcaseInput(
+        properties.push(
+          new Genome(
             prop.name,
             prop.schema,
             prop.required,
@@ -47,7 +46,7 @@ const generateChromosome = (operatrionObj) => {
     });
   }
 
-  return chromosome;
+  return new Chromosome(operationName, testType, parameters, properties);
 };
 
 const initializeFoodSource = (routesObj) => {
@@ -60,7 +59,6 @@ const initializeFoodSource = (routesObj) => {
   let totalNumberOfFiniteValues;
 
   let randomOperation;
-  let genome;
 
   // main loop => loop on each api route => return TC (chromosome) for each route
   // why?? => to ensure the path coverage for the Test Suite (each route in the api must have at least one HTTP request to be tested)
@@ -110,12 +108,13 @@ const initializeFoodSource = (routesObj) => {
 
     for (let i = 0; i < randomStopCondition; i++) {
       randomOperation = generateRandomInt(routeKeys.length - 1);
-      genome = {
-        operation: routeKeys[randomOperation],
-        testType: 'nominal',
-        ...generateChromosome(routesObj[route][routeKeys[randomOperation]]),
-      };
-      testCase.push(genome);
+      testCase.push(
+        generateChromosome(
+          routeKeys[randomOperation],
+          'nominal',
+          routesObj[route][routeKeys[randomOperation]]
+        )
+      );
     }
 
     population[route] = { testCase, numbers: { ...totalNumbers } };

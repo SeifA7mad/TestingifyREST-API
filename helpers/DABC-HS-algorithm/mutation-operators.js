@@ -6,7 +6,7 @@ const {
   isFinite,
 } = require('../generate-values');
 
-const TestcaseInput = require('../classes/TestcaseInput');
+const Genome = require('../classes/Genome');
 
 exports.changeFiniteValue = (inputs) => {
   // copy the inputs to edit it later
@@ -65,7 +65,7 @@ exports.addNewInput = (inputs, operationInputs) => {
 
   // add a new input object into newInputs
   newInputs.push(
-    new TestcaseInput(
+    new Genome(
       newInputsToBeAdded[randomNewInputChoice].name,
       newInputsToBeAdded[randomNewInputChoice].schema,
       newInputsToBeAdded[randomNewInputChoice].required,
