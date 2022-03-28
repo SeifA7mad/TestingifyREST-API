@@ -5,6 +5,8 @@ const {
   extractNumberOfPossiableValues,
 } = require('../generate-values');
 
+const TestcaseInput = require('../classes/TestcaseInput');
+
 const generateChromosome = (operatrionObj) => {
   const chromosome = {
     parameters: [],
@@ -14,16 +16,17 @@ const generateChromosome = (operatrionObj) => {
   if (operatrionObj.parameters.length > 0) {
     operatrionObj.parameters.forEach((param) => {
       if (param.required || generateRandomInt(1)) {
-        chromosome.parameters.push({
-          name: param.name,
-          schema: param.schema,
-          required: param.required,
-          value:
+        chromosome.parameters.push(
+          new TestcaseInput(
+            param.name,
+            param.schema,
+            param.required,
             param.schema.type === 'string' && param.example
               ? param.example
               : generateNominalValue(param.schema),
-          isFinite: isFinite(param.schema),
-        });
+            isFinite(param.schema)
+          )
+        );
       }
     });
   }
@@ -31,13 +34,15 @@ const generateChromosome = (operatrionObj) => {
   if (operatrionObj.requestBody) {
     operatrionObj.requestBody.properties.forEach((prop) => {
       if (prop.required || generateRandomInt(1)) {
-        chromosome.properties.push({
-          name: prop.name,
-          schema: prop.schema,
-          required: prop.required,
-          value: generateNominalValue(prop.schema),
-          isFinite: isFinite(prop.schema),
-        });
+        chromosome.properties.push(
+          new TestcaseInput(
+            prop.name,
+            prop.schema,
+            prop.required,
+            generateNominalValue(prop.schema),
+            isFinite(prop.schema)
+          )
+        );
       }
     });
   }
@@ -73,7 +78,9 @@ const initializeFoodSource = (routesObj) => {
     routeKeys.forEach((key) => {
       // parameters & requestBody for each operation
       const parameters = routesObj[route][key].parameters;
-      const properties = routesObj[route][key].requestBody ? routesObj[route][key].requestBody.properties : [];
+      const properties = routesObj[route][key].requestBody
+        ? routesObj[route][key].requestBody.properties
+        : [];
 
       // total number of inputs (how many parameters + how many properties in body request)
       totalNumberOfInputs += parameters.length + properties.length;

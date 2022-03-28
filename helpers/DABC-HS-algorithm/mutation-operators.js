@@ -6,6 +6,8 @@ const {
   isFinite,
 } = require('../generate-values');
 
+const TestcaseInput = require('../classes/TestcaseInput');
+
 exports.changeFiniteValue = (inputs) => {
   // copy the inputs to edit it later
   const newInputs = [...inputs];
@@ -62,14 +64,15 @@ exports.addNewInput = (inputs, operationInputs) => {
   const randomNewInputChoice = generateRandomInt(newInputsToBeAdded.length - 1);
 
   // add a new input object into newInputs
-  newInputs.push({
-    name: newInputsToBeAdded[randomNewInputChoice].name,
-    schema: newInputsToBeAdded[randomNewInputChoice].schema,
-    value: generateNominalValue(
-      newInputsToBeAdded[randomNewInputChoice].schema
-    ),
-    isFinite: isFinite(newInputsToBeAdded[randomNewInputChoice].schema),
-  });
+  newInputs.push(
+    new TestcaseInput(
+      newInputsToBeAdded[randomNewInputChoice].name,
+      newInputsToBeAdded[randomNewInputChoice].schema,
+      newInputsToBeAdded[randomNewInputChoice].required,
+      generateNominalValue(newInputsToBeAdded[randomNewInputChoice].schema),
+      isFinite(newInputsToBeAdded[randomNewInputChoice].schema)
+    )
+  );
 
   return newInputs;
 };
