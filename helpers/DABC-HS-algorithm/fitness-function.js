@@ -55,21 +55,22 @@ exports.fitness = (chromosome, numbers) => {
   // by: dividing number of overall mutated inputs used in testcase / total expected number of mutated inputs
   // only in mutation test cases type
   // STILL IN TESTING........................................
-  // const numberOfMutatedInputs = new Set(
-  //   chromosome.reduce((filteredCh, ch) => {
-  //     ch.testType === 'mutation'
-  //       ? filteredCh.push(...ch.mutationApplied.map((ma) => ma.inputName))
-  //       : null;
-  //     return filteredCh;
-  //   }, [])
-  // ).size;
-  // const mutatedParameterCoverage =
-  //   numberOfMutatedInputs / numbers.totalNumberOfInputs;
+  const numberOfMutatedInputs = new Set(
+    chromosome.reduce((filteredCh, ch) => {
+      ch.testType === 'mutation'
+        ? filteredCh.push(...ch.mutationApplied.map((ma) => ma.inputName))
+        : null;
+      return filteredCh;
+    }, [])
+  ).size;
+  const mutatedParameterCoverage =
+    numberOfMutatedInputs / numbers.totalNumberOfInputs;
 
   return +(fitnessValue =
     operationCoverage +
     parameterCoverage +
     inputValueCoverage +
+    mutatedParameterCoverage +
     statusCodeCoverage -
     chromosomeSizeCoverage).toFixed(4);
 };

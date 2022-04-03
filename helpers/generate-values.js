@@ -97,6 +97,41 @@ const isFinite = (schema) => {
   return schema.type === 'boolean' || schema.enum ? true : false;
 };
 
+const extractFitnessTotalNumbers = (routeObj) => {
+  const operations = Object.keys(routeObj);
+  const totalNumberOfOperations = operations.length;
+  let totalNumberOfInputs = 0;
+  let totalNumberOfFiniteValues = 0;
+
+  // loop to find the totalNumberOfInputs & totalNumberOfFiniteValues for every operation in this route
+  operations.forEach((op) => {
+    // parameters & requestBody for each operation
+    const parameters = routeObj[op].parameters;
+    const properties = routeObj[op].requestBody
+      ? routeObj[op].requestBody.properties
+      : [];
+
+    // total number of inputs (how many parameters + how many properties in body request)
+    totalNumberOfInputs += parameters.length + properties.length;
+
+    // map the parametrs & properties schemas into arrays to use it later
+    const paramsSchemas = parameters.map((param) => param.schema);
+    const propSchemas = properties.map((prop) => prop.schema);
+
+    // total number of finite values (extract the number of possiable values for finite type (boolean|enums)
+    // from the two schema arrays
+    totalNumberOfFiniteValues +=
+      extractNumberOfPossiableValues(paramsSchemas) +
+      extractNumberOfPossiableValues(propSchemas);
+  });
+
+  return {
+    totalNumberOfOperations,
+    totalNumberOfInputs,
+    totalNumberOfFiniteValues,
+  };
+};
+
 module.exports = {
   generateNominalValue,
   generateMutatedValue,
@@ -104,4 +139,5 @@ module.exports = {
   extractNumberOfPossiableValues,
   generateViolationValue,
   isFinite,
+  extractFitnessTotalNumbers,
 };

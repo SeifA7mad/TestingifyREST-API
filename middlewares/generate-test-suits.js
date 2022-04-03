@@ -16,28 +16,30 @@ exports.generateTestSuits = (req, res, next) => {
   const currentPopulation = initializeFoodSource(req.routes);
   const populationKeys = Object.keys(currentPopulation);
 
-  console.log('Sample TEST CASE');
-  console.log(
-    currentPopulation[populationKeys[0]]['testCase'],
-    '\n',
-    fitness(
-      currentPopulation[populationKeys[0]]['testCase'],
-      currentPopulation[populationKeys[0]]['numbers']
-    )
-  );
+  console.log(currentPopulation);
 
-  const newTestCase = mutation(
-    currentPopulation[populationKeys[0]]['testCase'],
-    req.routes[Object.keys(req.routes)[0]]
-    // 1 / currentPopulation[populationKeys[0]]['testCase'].length,
-  );
+  // console.log('Sample TEST CASE');
+  // console.log(
+  //   currentPopulation[populationKeys[0]]['testCase'],
+  //   '\n',
+  //   fitness(
+  //     currentPopulation[populationKeys[0]]['testCase'],
+  //     currentPopulation[populationKeys[0]]['numbers']
+  //   )
+  // );
 
-  console.log('Sample TEST CASE AFTER MUTATION');
-  console.log(
-    newTestCase,
-    '\n',
-    fitness(newTestCase, currentPopulation[populationKeys[0]]['numbers'])
-  );
+  // const newTestCase = mutation(
+  //   currentPopulation[populationKeys[0]]['testCase'],
+  //   req.routes[Object.keys(req.routes)[0]]
+  //   // 1 / currentPopulation[populationKeys[0]]['testCase'].length,
+  // );
+
+  // console.log('Sample TEST CASE AFTER MUTATION');
+  // console.log(
+  //   newTestCase,
+  //   '\n',
+  //   fitness(newTestCase, currentPopulation[populationKeys[0]]['numbers'])
+  // );
 
   // Employed bee Phase
   // for (let i = 0; i < populationSize; i++) {
