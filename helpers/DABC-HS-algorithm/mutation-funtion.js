@@ -22,13 +22,11 @@ const nominalMutation = (genome, operationInputs, inputType) => {
   const newGenome = { ...genome };
 
   const editableMutationOperator = [...nominalMutationOperator];
-
-  // choose a random nominal mutation operator ['changeFinite', 'addNewInput', 'removeInput']
-  let mutationOP;
-
+  
   // loop: until there is at least one mutation operator is applied else remove the unappliable mutation operator from choices
   while (editableMutationOperator.length > 0) {
-    mutationOP =
+    // choose a random nominal mutation operator ['changeFinite', 'addNewInput', 'removeInput']
+    const mutationOP =
       editableMutationOperator[
         generateRandomInt(editableMutationOperator.length - 1)
       ];
@@ -99,9 +97,6 @@ const errorMutation = (genome, inputType) => {
 
 exports.mutation = (chromosome, routeObj, MR = 0.5) => {
   const newChromosome = [...chromosome];
-  let mutationTypeChoice;
-  let inputType;
-  let operationInput;
 
   // loop on every Genome in the Test Case chromosome
   for (let i = 0; i < chromosome.length; i++) {
@@ -111,14 +106,14 @@ exports.mutation = (chromosome, routeObj, MR = 0.5) => {
     }
 
     // choose random mutation type => (nominal testing or mutation testing)
-    mutationTypeChoice = generateRandomInt(mutationType.length - 1);
+    const mutationTypeChoice = generateRandomInt(mutationType.length - 1);
 
     // choose wether to mutate parameters or properties
     // if the original operation contains params & props => choose random one to work on
     // only params => choose params (by default)
     // only props => choose props (by default)
     // routeObj[chromosome[i].operation] =(standsfor)> access the current original operation from route object by the current operation name from the chromosome
-    inputType =
+    const inputType =
       inputTypes[
         routeObj[chromosome[i].operation].parameters.length > 0 &&
         routeObj[chromosome[i].operation].requestBody > 0
@@ -128,7 +123,7 @@ exports.mutation = (chromosome, routeObj, MR = 0.5) => {
           : 1
       ];
 
-    operationInput =
+    const operationInput =
       inputType === 'properties'
         ? routeObj[chromosome[i].operation].requestBody.properties
         : routeObj[chromosome[i].operation].parameters;
