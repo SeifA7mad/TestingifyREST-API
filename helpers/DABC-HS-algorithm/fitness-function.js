@@ -1,14 +1,14 @@
-exports.fitness = (chromosome, numbers) => {
+exports.fitness = (testCase, numbers) => {
   // check Operations Coverage
   // by: dividing number of distinct operations in the current testcase / total expected number of operations
-  const numberOfOperations = new Set(chromosome.map((ch) => ch.operation)).size;
+  const numberOfOperations = new Set(testCase.map((ch) => ch.operation)).size;
   const operationCoverage =
     numberOfOperations / numbers.totalNumberOfOperations;
 
   // check Paramters Coverage
   // by: dividing number of overall inputs used in testcase / total expected number of inputs
   const numberOfInputs = new Set(
-    chromosome.reduce((filteredCh, ch) => {
+    testCase.reduce((filteredCh, ch) => {
       filteredCh.push(...ch.parameters.map((param) => param.name));
       filteredCh.push(...ch.properties.map((prop) => prop.name));
       return filteredCh;
@@ -23,7 +23,7 @@ exports.fitness = (chromosome, numbers) => {
     const finiteInputs = [];
     // filter from parametrs&properties the finite values only
     // add to an array
-    chromosome.forEach((ch) => {
+    testCase.forEach((ch) => {
       finiteInputs.push(...ch.parameters.filter((param) => param.isFinite));
       finiteInputs.push(...ch.properties.filter((prop) => prop.isFinite));
     });
@@ -42,23 +42,23 @@ exports.fitness = (chromosome, numbers) => {
   // total number of expected status code: number of distinct operation in testcase * 2
   const totalNumberOfExpectedStatusCode = numberOfOperations * 2;
   const numberOfExpectedStatusCode = new Set(
-    chromosome.map((ch) => ch.operation + ch.testType)
+    testCase.map((ch) => ch.operation + ch.testType)
   ).size;
 
   const statusCodeCoverage =
     numberOfExpectedStatusCode / totalNumberOfExpectedStatusCode;
 
   // check testcase size -> more is worst
-  const chromosomeSizeCoverage = chromosome.length / numbers.maxTestcaseSize;
+  const testCaseSizeCoverage = testCase.length / numbers.maxTestcaseSize;
 
   // check Mutated Paramters Coverage
   // by: dividing number of overall mutated inputs used in testcase / total expected number of mutated inputs
   // only in mutation test cases type
-  // STILL IN TESTING........................................
+  // !STILL IN TESTING........................................
   // const numberOfMutatedInputs = new Set(
-  //   chromosome.reduce((filteredCh, ch) => {
+  //   testCase.reduce((filteredCh, ch) => {
   //     ch.testType === 'mutation'
-  //       ? filteredCh.push(...ch.mutationApplied.map((ma) => ma.inputName))
+  //     ? filteredCh.push(...ch.mutationApplied.map((ma) => ma.inputName))
   //       : null;
   //     return filteredCh;
   //   }, [])
@@ -71,5 +71,5 @@ exports.fitness = (chromosome, numbers) => {
     parameterCoverage +
     inputValueCoverage +
     statusCodeCoverage -
-    chromosomeSizeCoverage).toFixed(4);
+    testCaseSizeCoverage).toFixed(4);
 };
