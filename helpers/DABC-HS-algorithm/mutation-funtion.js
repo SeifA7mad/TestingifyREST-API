@@ -18,8 +18,8 @@ const errorMutationOperator = [
   'constraintViolation',
 ];
 
-const nominalMutation = (genome, operationInputs, inputType) => {
-  const newGenome = { ...genome };
+const nominalMutation = (chromosome, operationInputs, inputType) => {
+  const newChromosome = Object.assign(Object.create(Object.getPrototypeOf(chromosome)), chromosome);
 
   const editableMutationOperator = [...nominalMutationOperator];
   
@@ -34,28 +34,28 @@ const nominalMutation = (genome, operationInputs, inputType) => {
     // if mutationOP === 'changeFinite' =(first: mutation operator)> change a finite value to another value
     // if mutationOP === 'addNewInput' =(second: mutation operator)> add new input either to parameters or to properties (new input must be distict)
     // if mutationOP === 'removeInput' =(third: mutation operator)> remove a random non required input
-    const newInputs =
+    const newGenomes =
       mutationOP === 'changeFinite'
-        ? changeFiniteValue(genome[inputType])
+        ? changeFiniteValue(chromosome[inputType])
         : mutationOP === 'addNewInput'
-        ? addNewInput(genome[inputType], operationInputs)
-        : removeNonRequiredInput(genome[inputType]);
-    if (!newInputs) {
+        ? addNewInput(chromosome[inputType], operationInputs)
+        : removeNonRequiredInput(chromosome[inputType]);
+    if (!newGenomes) {
       editableMutationOperator.splice(
         editableMutationOperator.indexOf(mutationOP),
         1
       );
       continue;
     }
-    newGenome[inputType] = newInputs;
-    return newGenome;
+    newChromosome[inputType] = newGenomes;
+    return newChromosome;
   }
 
-  return newGenome;
+  return newChromosome;
 };
 
-const errorMutation = (genome, inputType) => {
-  const newGenome = { ...genome };
+const errorMutation = (chromosome, inputType) => {
+  const newChromosome = Object.assign(Object.create(Object.getPrototypeOf(chromosome)), chromosome);
 
   const editableMutationOperator = [...errorMutationOperator];
 
@@ -68,39 +68,39 @@ const errorMutation = (genome, inputType) => {
     // if mutationOP === 'missingRequired' =(first: mutation operator)> remove a random required input
     // if mutationOP === 'wrongInputType' =(second: mutation operator)>
     // if mutationOP === 'constraintViolation' =(third: mutation operator)>
-    const newInputs =
+    const newGenomes =
       mutationOP === 'missingRequired'
-        ? removeRequiredInput(genome[inputType])
+        ? removeRequiredInput(chromosome[inputType])
         : mutationOP === 'wrongInputType'
-        ? mutateInputType(genome[inputType])
-        : constraintViolation(genome[inputType]);
+        ? mutateInputType(chromosome[inputType])
+        : constraintViolation(chromosome[inputType]);
 
-    if (!newInputs) {
+    if (!newGenomes) {
       editableMutationOperator.splice(
         editableMutationOperator.indexOf(mutationOP),
         1
       );
       continue;
     }
-    newGenome[inputType] = newInputs.inputs;
-    newGenome['testType'] = 'mutation';
+    newChromosome[inputType] = newGenomes.genomes;
+    newChromosome['testType'] = 'mutation';
     // mutationOP === 'missingRequired'
-    //   ? (newGenome['expectedStatuscode'] = 400)
-    //   : (newGenome['expectedStatuscode'] = 500);
-    newGenome['mutationApplied'].push(newInputs.mutationApplied);
+    //   ? (newChromosome['expectedStatuscode'] = 400)
+    //   : (newChromosome['expectedStatuscode'] = 500);
+    newChromosome['mutationApplied'].push(newGenomes.mutationApplied);
 
-    return newGenome;
+    return newChromosome;
   }
 
-  return newGenome;
+  return newChromosome;
 };
 
-exports.mutation = (chromosome, routeObj, MR = 0.5) => {
-  const newChromosome = [...chromosome];
+exports.mutate = (testCase, routeObj, MR = 0.5) => {
+  const newTestCase = [...testCase];
 
-  // loop on every Genome in the Test Case chromosome
-  for (let i = 0; i < chromosome.length; i++) {
-    // if random number > MR (mutation rate) => ignore (exclude) this Genome from mutation
+  // loop on every Chromosome in the Test Case
+  for (let i = 0; i < testCase.length; i++) {
+    // if random number > MR (mutation rate) => ignore (exclude) this chromosome from mutation
     if (Math.random() > MR) {
       continue;
     }
@@ -112,36 +112,32 @@ exports.mutation = (chromosome, routeObj, MR = 0.5) => {
     // if the original operation contains params & props => choose random one to work on
     // only params => choose params (by default)
     // only props => choose props (by default)
-    // routeObj[chromosome[i].operation] =(standsfor)> access the current original operation from route object by the current operation name from the chromosome
+    // routeObj[testCase[i].operation] =(standsfor)> access the current original operation from route object by the current operation name from the chromosome
     const inputType =
       inputTypes[
-        routeObj[chromosome[i].operation].parameters.length > 0 &&
-        routeObj[chromosome[i].operation].requestBody > 0
+        routeObj[testCase[i].operation].parameters.length > 0 &&
+        routeObj[testCase[i].operation].requestBody !== null
           ? generateRandomInt(inputTypes.length - 1)
-          : routeObj[chromosome[i].operation].parameters.length > 0
-          ? 0
-          : 1
+          : routeObj[testCase[i].operation].requestBody !== null
+          ? 1
+          : 0
       ];
 
     const operationInput =
       inputType === 'properties'
-        ? routeObj[chromosome[i].operation].requestBody.properties
-        : routeObj[chromosome[i].operation].parameters;
+        ? routeObj[testCase[i].operation].requestBody.properties
+        : routeObj[testCase[i].operation].parameters;
 
     // if mutation type == 'nominal testing' the test case (chromosome) must be of type nominal to be able to perform nominal mutation
     if (
       mutationType[mutationTypeChoice] === 'nominalTesting' &&
-      chromosome[i].testType === 'nominal'
+      testCase[i].testType === 'nominal'
     ) {
-      newChromosome[i] = nominalMutation(
-        chromosome[i],
-        operationInput,
-        inputType
-      );
+      newTestCase[i] = nominalMutation(testCase[i], operationInput, inputType);
     } else {
-      newChromosome[i] = errorMutation(chromosome[i], inputType);
+      newTestCase[i] = errorMutation(testCase[i], inputType);
     }
   }
 
-  return newChromosome;
+  return newTestCase;
 };
