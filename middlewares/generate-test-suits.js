@@ -10,7 +10,7 @@ exports.generateTestSuits = (req, res, next) => {
   //! ............................................Initialization Phase.........................................................
   const populationSize = Object.keys(req.routes).length;
   const trials = new Array(populationSize).fill(0);
-
+  const fitnessValues = new Array(populationSize);
   // maximum number of fitness evaluations
   const mfe = 50;
   // The maximum number of the trials to determine exhausted sources
@@ -35,8 +35,10 @@ exports.generateTestSuits = (req, res, next) => {
       if (newFitnessValue > oldFitnessValue) {
         currentPopulation[populationKeys[i]]['testCase'] = newTestCase;
         trials[i] = 0;
+        fitnessValues[i] = newFitnessValue;
       } else {
         trials[i]++;
+        fitnessValues[i] = oldFitnessValue;
       }
     }
     //! ....................................................END..................................................................
@@ -58,8 +60,10 @@ exports.generateTestSuits = (req, res, next) => {
       if (newFitnessValue > oldFitnessValue) {
         currentPopulation[populationKeys[i]]['testCase'] = newTestCase;
         trials[i] = 0;
+        fitnessValues[i] = newFitnessValue;
       } else {
         trials[i]++;
+        fitnessValues[i] = oldFitnessValue;
       }
     }
     //! ....................................................END..................................................................
@@ -70,10 +74,15 @@ exports.generateTestSuits = (req, res, next) => {
         currentPopulation[populationKeys[i]] = initializeFoodSource(
           req.routes[routesKeys[i]]
         );
+        fitnessValues[i] = fitness(
+          currentPopulation[populationKeys[i]]['testCase'],
+          currentPopulation[populationKeys[i]]['numbers']
+        );
       }
     }
     //! ....................................................END..................................................................
   }
-  console.log(currentPopulation);
+  // console.log(currentPopulation);
+  console.log(fitnessValues);
   next();
 };
