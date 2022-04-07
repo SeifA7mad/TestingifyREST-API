@@ -12,13 +12,16 @@ exports.generateTestSuits = (req, res, next) => {
   const trials = new Array(populationSize).fill(0);
   const fitnessValues = new Array(populationSize);
   // maximum number of fitness evaluations
-  const mfe = 50;
+  const mfe = 100;
   // The maximum number of the trials to determine exhausted sources
   const limit = 3;
   // first population => currentPopulation
   const currentPopulation = initializeFoodSources(req.routes);
   const populationKeys = Object.keys(currentPopulation);
   const routesKeys = Object.keys(req.routes);
+
+  console.log('INITIALIZED POPULATION');
+  console.log(currentPopulation);
   //! ....................................................END..................................................................
   for (let fe = 0; fe < mfe; fe++) {
     //! ............................................Employed Bee phase...........................................................
@@ -82,7 +85,8 @@ exports.generateTestSuits = (req, res, next) => {
     }
     //! ....................................................END..................................................................
   }
-  // console.log(currentPopulation);
+  console.log('POPULATION AFTER ALGO.');
+  console.log(currentPopulation);
   console.log(fitnessValues);
   next();
 };
