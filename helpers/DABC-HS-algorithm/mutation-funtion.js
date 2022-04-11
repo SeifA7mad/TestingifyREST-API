@@ -9,6 +9,8 @@ const {
   constraintViolation,
 } = require('./mutation-operators');
 
+const Chromosome = require('../classes/Chromosome');
+
 const mutationType = ['nominalTesting', 'mutationTesting'];
 const inputTypes = ['parameters', 'properties'];
 const nominalMutationOperator = ['changeFinite', 'addNewInput', 'removeInput'];
@@ -18,11 +20,16 @@ const errorMutationOperator = [
   'constraintViolation',
 ];
 
+const mutationStructureType = ['addChromosome', 'removeChromosome'];
+
 const nominalMutation = (chromosome, operationInputs, inputType) => {
-  const newChromosome = Object.assign(Object.create(Object.getPrototypeOf(chromosome)), chromosome);
+  const newChromosome = Object.assign(
+    Object.create(Object.getPrototypeOf(chromosome)),
+    chromosome
+  );
 
   const editableMutationOperator = [...nominalMutationOperator];
-  
+
   // loop: until there is at least one mutation operator is applied else remove the unappliable mutation operator from choices
   while (editableMutationOperator.length > 0) {
     // choose a random nominal mutation operator ['changeFinite', 'addNewInput', 'removeInput']
@@ -55,7 +62,10 @@ const nominalMutation = (chromosome, operationInputs, inputType) => {
 };
 
 const errorMutation = (chromosome, inputType) => {
-  const newChromosome = Object.assign(Object.create(Object.getPrototypeOf(chromosome)), chromosome);
+  const newChromosome = Object.assign(
+    Object.create(Object.getPrototypeOf(chromosome)),
+    chromosome
+  );
 
   const editableMutationOperator = [...errorMutationOperator];
 
@@ -137,6 +147,34 @@ exports.mutate = (testCase, routeObj, MR = 0.5) => {
     } else {
       newTestCase[i] = errorMutation(testCase[i], inputType);
     }
+  }
+
+  return newTestCase;
+};
+
+exports.mutateStructure = (testCase, routeObj) => {
+  const newTestCase = [...testCase];
+
+  // choose random mutation structure type => (addChromosome or removeChromosome)
+  const mutationStructureChoice = generateRandomInt(
+    mutationStructureType.length - 1
+  );
+
+  if (mutationStructureType[mutationStructureChoice] === 'addChromosome') {
+    const routeKeys = Object.keys(routeObj);
+    const randomOperation = generateRandomInt(routeKeys.length - 1);
+    newTestCase.push(
+      Chromosome.generateChromosome(
+        routeKeys[randomOperation],
+        'nominal',
+        routeObj[routeKeys[randomOperation]]
+      )
+    );
+  } else if (mutationStructureType[mutationStructureChoice] === 'removeChromosome') {
+    const randomChromosomeToBeRemoved = generateRandomInt(
+      newTestCase.length - 1
+    );
+    newTestCase.splice(randomChromosomeToBeRemoved, 1);
   }
 
   return newTestCase;

@@ -4,7 +4,10 @@ const {
 } = require('../helpers/DABC-HS-algorithm/initialize-food-source');
 
 const { fitness } = require('../helpers/DABC-HS-algorithm/fitness-function');
-const { mutate } = require('../helpers/DABC-HS-algorithm/mutation-funtion');
+const {
+  mutate,
+  mutateStructure,
+} = require('../helpers/DABC-HS-algorithm/mutation-funtion');
 
 exports.generateTestSuits = (req, res, next) => {
   //! ............................................Initialization Phase.........................................................
@@ -22,7 +25,7 @@ exports.generateTestSuits = (req, res, next) => {
 
   console.log('INITIALIZED POPULATION');
   console.log(currentPopulation);
-  //! ....................................................END..................................................................
+  //! ....................................................END....................................................................
   for (let fe = 0; fe < mfe; fe++) {
     //! ............................................Employed Bee phase...........................................................
     for (let i = 0; i < populationSize; i++) {
@@ -54,7 +57,7 @@ exports.generateTestSuits = (req, res, next) => {
       const testCase = currentPopulation[populationKeys[i]]['testCase'];
       const numbers = currentPopulation[populationKeys[i]]['numbers'];
 
-      const newTestCase = mutate(testCase, req.routes[routesKeys[i]]);
+      const newTestCase = mutateStructure(testCase, req.routes[routesKeys[i]]);
 
       const oldFitnessValue = fitness(testCase, numbers);
 
@@ -83,7 +86,7 @@ exports.generateTestSuits = (req, res, next) => {
         );
       }
     }
-    //! ....................................................END..................................................................
+    //! ....................................................END...................................................................
   }
   console.log('POPULATION AFTER ALGO.');
   console.log(currentPopulation);
