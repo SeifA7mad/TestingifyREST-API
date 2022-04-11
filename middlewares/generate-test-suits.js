@@ -10,7 +10,7 @@ const {
 } = require('../helpers/DABC-HS-algorithm/mutation-funtion');
 
 exports.generateTestSuits = (req, res, next) => {
-  //! ............................................Initialization Phase.........................................................
+  //! ............................................Initialization Phase..........................................................
   const populationSize = Object.keys(req.routes).length;
   const trials = new Array(populationSize).fill(0);
   const fitnessValues = new Array(populationSize);
