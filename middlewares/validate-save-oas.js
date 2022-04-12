@@ -19,6 +19,24 @@ exports.saveOasToFile = (req, res, next) => {
 };
 
 exports.validateAccessToApi = async (req, res, next) => {
+  const authorizationProtocol = {
+    ApiKeyAuth: {
+      name: '',
+      in: '',
+    },
+    BearerAuth: {
+      name: 'Authorization',
+      in: 'header',
+      prefix: 'Bearer',
+    },
+    BasicAuth: {
+      name: 'Authorization',
+      in: 'header',
+      prefix: 'Basic',
+    },
+    OAuth2: {},
+    OpenID: {},
+  };
   try {
     const oas = await SwaggerParser.bundle(req.workingFilePath);
 
@@ -41,7 +59,7 @@ exports.validateAccessToApi = async (req, res, next) => {
 
     // loop on security schemas to validate&assure access to the API
     for (let key in requiredSecurity) {
-      if (Object.keys(req.query).length === 0) {
+      if (Object.keys(req.query).length === Object.keys(requiredSecurity).length) {
         const error = new Error(
           `unauthorized, secuirty info: ${requiredSecurity[key].type} required.`
         );
