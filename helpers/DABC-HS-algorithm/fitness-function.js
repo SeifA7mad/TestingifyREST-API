@@ -7,14 +7,17 @@ exports.fitness = (testCase, numbers) => {
 
   // check Paramters Coverage
   // by: dividing number of overall inputs used in testcase / total expected number of inputs
-  const numberOfInputs = new Set(
-    testCase.reduce((filteredCh, ch) => {
-      filteredCh.push(...ch.parameters.map((param) => param.name));
-      filteredCh.push(...ch.properties.map((prop) => prop.name));
-      return filteredCh;
-    }, [])
-  ).size;
-  const parameterCoverage = numberOfInputs / numbers.totalNumberOfInputs;
+  let parameterCoverage = 0;
+  if (numbers.totalNumberOfInputs != 0) {
+    const numberOfInputs = new Set(
+      testCase.reduce((filteredCh, ch) => {
+        filteredCh.push(...ch.parameters.map((param) => param.name));
+        filteredCh.push(...ch.properties.map((prop) => prop.name));
+        return filteredCh;
+      }, [])
+    ).size;
+    parameterCoverage = numberOfInputs / numbers.totalNumberOfInputs;
+  }
 
   // check Inputs value Coverage
   // by: dividing number of distinct finite values(boolean|enums) used in testcase / total expected finite values

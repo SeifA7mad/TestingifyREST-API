@@ -91,5 +91,6 @@ exports.generateTestSuits = (req, res, next) => {
   console.log('POPULATION AFTER ALGO.');
   console.log(currentPopulation);
   console.log(fitnessValues);
+  req.testSuite = currentPopulation;
   next();
 };
