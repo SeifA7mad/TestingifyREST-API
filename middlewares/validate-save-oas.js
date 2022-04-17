@@ -57,9 +57,16 @@ exports.validateAccessToApi = async (req, res, next) => {
     const requiredSecurity = oas.components.securitySchemes;
     const securityMap = new Map();
 
+    // console.log(Buffer.from("username:password").toString('base64'));
+    // SGVsbG8gV29ybGQ=
+    // > console.log(Buffer.from("SGVsbG8gV29ybGQ=", 'base64').toString('ascii'))
+    // Hello World
+
     // loop on security schemas to validate&assure access to the API
     for (let key in requiredSecurity) {
-      if (Object.keys(req.query).length === Object.keys(requiredSecurity).length) {
+      if (
+        Object.keys(req.query).length === Object.keys(requiredSecurity).length
+      ) {
         const error = new Error(
           `unauthorized, secuirty info: ${requiredSecurity[key].type} required.`
         );
@@ -77,7 +84,7 @@ exports.validateAccessToApi = async (req, res, next) => {
 
     // console.log(securityMap);
     req.requiredSecurityInfo = securityMap;
-    req.server = oas.servers[0].url; 
+    req.server = oas.servers[0].url;
     next();
   } catch (err) {
     next(err);
