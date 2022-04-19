@@ -29,7 +29,7 @@ exports.generateTestSuits = (req, res, next) => {
   // maximum value of fitness function
   const mfv = populationSize * 5;
   // The maximum number of the trials to determine exhausted sources
-  const limit = 3;
+  const limit = 5;
   // first population => currentPopulation
   const currentPopulation = initializeFoodSources(req.routes);
   const populationKeys = Object.keys(currentPopulation);
@@ -89,16 +89,28 @@ exports.generateTestSuits = (req, res, next) => {
     //! ....................................................END..................................................................
 
     //! ............................................Scout Bee phase..............................................................
-    for (let i = 0; i < populationSize; i++) {
-      if (trials[i] > limit) {
-        currentPopulation[populationKeys[i]] = initializeFoodSource(
-          req.routes[routesKeys[i]]
-        );
-        fitnessValues[i] = fitness(
-          currentPopulation[populationKeys[i]]['testCase'],
-          currentPopulation[populationKeys[i]]['numbers']
-        );
+    const filteredTrials = trials
+      .map((trial, index) => (trial > limit ? [index, trial] : undefined))
+      .filter((trial) => trial !== undefined);
+
+    if (filteredTrials.length > 0) {
+      let max = -1;
+      let maxTrailIndex;
+      for (let i = 0; i < filteredTrials.length; i++) {
+        if (max < filteredTrials[i][1]) {
+          max = filteredTrials[i][1];
+          maxTrailIndex = filteredTrials[i][0];
+        }
       }
+
+      currentPopulation[populationKeys[maxTrailIndex]] = initializeFoodSource(
+        req.routes[routesKeys[maxTrailIndex]]
+      );
+      trials[maxTrailIndex] = 0;
+      fitnessValues[maxTrailIndex] = fitness(
+        currentPopulation[populationKeys[maxTrailIndex]]['testCase'],
+        currentPopulation[populationKeys[maxTrailIndex]]['numbers']
+      );
     }
     //! ....................................................END...................................................................
   }
