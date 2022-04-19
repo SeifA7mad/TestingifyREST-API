@@ -11,13 +11,13 @@ const {
 
 const calculateProbabilities = (fitnessValues, maxFit) => {
   const probabilities = [];
-  fitnessValues.forEach(value => {
+  fitnessValues.forEach((value) => {
     const propValue = 0.9 * (value / maxFit) + 0.1;
     probabilities.push(propValue);
   });
 
   return probabilities;
-}
+};
 
 exports.generateTestSuits = (req, res, next) => {
   //! ............................................Initialization Phase..........................................................
@@ -63,33 +63,28 @@ exports.generateTestSuits = (req, res, next) => {
 
     //! ............................................Onlooker Bee phase...........................................................
     const prob = calculateProbabilities(fitnessValues, mfv);
-    let j = 0
-    let k = 0;
-    while (k < populationSize) {
-      if (Math.random() < prob[j]) {
-        const testCase = currentPopulation[populationKeys[j]]['testCase'];
-        const numbers = currentPopulation[populationKeys[j]]['numbers'];
-
-        const newTestCase = mutateStructure(
-          testCase,
-          req.routes[routesKeys[j]]
-        );
-
-        const oldFitnessValue = fitness(testCase, numbers);
-
-        const newFitnessValue = fitness(newTestCase, numbers);
-
-        if (newFitnessValue > oldFitnessValue) {
-          currentPopulation[populationKeys[j]]['testCase'] = newTestCase;
-          trials[j] = 0;
-          fitnessValues[j] = newFitnessValue;
-        } else {
-          trials[j]++;
-          fitnessValues[j] = oldFitnessValue;
-        }
-        k++;
+    for (let i = 0, k = 0; k < populationSize; i = ++i % populationSize) {
+      if (Math.random() > prob[i]) {
+        continue;
       }
-      j = ++j % populationSize;
+      const testCase = currentPopulation[populationKeys[i]]['testCase'];
+      const numbers = currentPopulation[populationKeys[i]]['numbers'];
+
+      const newTestCase = mutateStructure(testCase, req.routes[routesKeys[i]]);
+
+      const oldFitnessValue = fitness(testCase, numbers);
+
+      const newFitnessValue = fitness(newTestCase, numbers);
+
+      if (newFitnessValue > oldFitnessValue) {
+        currentPopulation[populationKeys[i]]['testCase'] = newTestCase;
+        trials[i] = 0;
+        fitnessValues[i] = newFitnessValue;
+      } else {
+        trials[i]++;
+        fitnessValues[i] = oldFitnessValue;
+      }
+      k++;
     }
     //! ....................................................END..................................................................
 
