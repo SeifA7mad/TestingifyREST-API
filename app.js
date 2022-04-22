@@ -13,7 +13,6 @@ app.use((req, res, next) => {
   if (!fs.existsSync('./data')) {
     fs.mkdirSync('./data');
   }
-  // global.dictionary = {};
   next();
 });
 

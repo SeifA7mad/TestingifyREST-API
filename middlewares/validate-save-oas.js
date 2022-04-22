@@ -20,22 +20,23 @@ exports.saveOasToFile = (req, res, next) => {
 
 exports.validateAccessToApi = async (req, res, next) => {
   const authorizationProtocol = {
-    ApiKeyAuth: {
+    apikeyauth: {
       name: '',
       in: '',
+      prefix: '',
     },
-    BearerAuth: {
+    bearerauth: {
       name: 'Authorization',
       in: 'header',
       prefix: 'Bearer',
     },
-    BasicAuth: {
+    basicauth: {
       name: 'Authorization',
       in: 'header',
       prefix: 'Basic',
     },
-    OAuth2: {},
-    OpenID: {},
+    // OAuth2: {},
+    // OpenID: {},
   };
   try {
     const oas = await SwaggerParser.bundle(req.workingFilePath);
@@ -64,25 +65,41 @@ exports.validateAccessToApi = async (req, res, next) => {
 
     // loop on security schemas to validate&assure access to the API
     for (let key in requiredSecurity) {
+      // validate => if it's valid authorization Protocol
+      if (
+        !Object.keys(authorizationProtocol).includes(key.toLocaleLowerCase()) &&
+        requiredSecurity[key].type !== 'apiKey'
+      ) {
+        const error = new Error(`unauthorized, unknown secuirty info: ${key}.`);
+        error.statusCode = 401;
+        throw error;
+      }
+
+      // validate => all the required authorization protocols has given values in query params
       if (
         Object.keys(req.query).length !== Object.keys(requiredSecurity).length
       ) {
         const error = new Error(
-          `unauthorized, secuirty info: ${requiredSecurity[key].type} required.`
+          `unauthorized, secuirty info: ${key} required.`
         );
         error.statusCode = 401;
         throw error;
       }
+
+      const securityType = requiredSecurity[key].type;
+      if (securityType === 'apiKey') {
+        authorizationProtocol['apikeyauth'].in = requiredSecurity[key].in;
+        authorizationProtocol['apikeyauth'].name = requiredSecurity[key].name;
+      }
+
       securityMap.set(key, {
-        value: req.query[requiredSecurity[key].type.toString().toLowerCase()],
-        in: requiredSecurity[key].in ? requiredSecurity[key].in : 'header',
-        name: requiredSecurity[key].name
-          ? requiredSecurity[key].name
-          : 'Authorization',
+        ...authorizationProtocol[
+          securityType === 'apiKey' ? 'apikeyauth' : key.toLowerCase()
+        ],
+        value: req.query[key],
       });
     }
 
-    // console.log(securityMap);
     req.requiredSecurityInfo = securityMap;
     req.server = oas.servers[0].url;
     next();
