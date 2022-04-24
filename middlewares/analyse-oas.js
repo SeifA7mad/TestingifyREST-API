@@ -35,6 +35,7 @@ const transformRoute = (route, path) => {
     outputs: {},
     prefixingValue: prefixingValue,
     basicUri: path.toString(),
+    requiredSecurity: route.security ? route.security : null,
   };
 
   // input: parameters
@@ -158,7 +159,7 @@ exports.transformRoutes = async (req, res, next) => {
     // );
 
     req.routes = routesMap;
-
+    req.requiredGeneralSecurity = oas.security ? oas.security : null;
     next();
   } catch (err) {
     next(err);
