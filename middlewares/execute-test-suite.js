@@ -1,7 +1,13 @@
 const axios = require('axios').default;
 const { parse } = require('uri-template');
 
-const executeTestCase = async (serverURL, requestURL, testInputs, operation, security) => {
+const executeTestCase = async (
+  serverURL,
+  requestURL,
+  testInputs,
+  operation,
+  security
+) => {
   let reqURL = requestURL;
   const URLTemplate = parse(reqURL);
 
@@ -13,19 +19,36 @@ const executeTestCase = async (serverURL, requestURL, testInputs, operation, sec
     reqURL = URLTemplate.expand(paramsObj);
   }
 
-  const propsObj = {};
+  const propsObj = null;
   if (testInputs.props.length > 0) {
+    propsObj = {};
     testInputs.props.forEach((prop) => {
       propsObj[prop.name] = prop.value;
     });
   }
 
+  let apikey = '';
+  const securityHeaders = {};
+  if (security) {
+    console.log(security);
+    security.forEach((key) => {
+      if (key.in === 'query') {
+        apikey = `&${key.name}=${key.value}`;
+      }
+      if (key.in === 'header') {
+        securityHeaders[key.name] = `${key.prefix} ${key.value}`;
+      }
+      if (key.in === 'cookie') {
+        securityHeaders['Cookie'] = `${key.name}=${key.value}`;
+      }
+    });
+  }
 
   const reqConfig = {
     method: operation,
-    url: serverURL + reqURL,
-    data: propsObj,
-    headers: {},
+    url: `${serverURL}${reqURL}${apikey}`,
+    data: propsObj ? propsObj : null,
+    headers: securityHeaders,
   };
   const res = await axios(reqConfig);
   return await res.json();
@@ -43,12 +66,24 @@ exports.executeTestSuite = (req, res, next) => {
       const props = testRequest.properties;
       const op = testRequest.operation;
       const requestURL = req.routes[testSuiteRoute][op].basicURL;
-      const requiredSecurity = req.routes[testSuiteRoute][op].requiredSecurity;
+      const requiredSecurity = req.routes[testSuiteRoute][op].requiredSecurity
+        ? req.routes[testSuiteRoute][op].requiredSecurity
+        : generalRequiredSecurity;
 
-      executeTestCase(req.server, requestURL, { params, props }, op, {
-        generalRequiredSecurity,
-        requiredSecurity,
-      }).then(data => { console.log(data)}).catch(err => {console.log(err)});
+      const security = [];
+      if (requiredSecurity) {
+        requiredSecurity.forEach((key) => {
+          security.push(req.requiredSecurityInfo.get(Object.keys(key)[0]));
+        });
+      }
+
+      executeTestCase(req.server, requestURL, { params, props }, op, security)
+        .then((data) => {
+          console.log(data);
+        })
+        .catch((err) => {
+          console.log(err.response);
+        });
     }
   }
   next();
