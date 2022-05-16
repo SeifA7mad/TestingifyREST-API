@@ -34,7 +34,7 @@ const transformRoute = (route, path) => {
     requestBody: null,
     outputs: {},
     prefixingValue: prefixingValue,
-    basicUri: path.toString(),
+    basicURL: path.toString(),
     requiredSecurity: route.security ? route.security : null,
   };
 
@@ -43,7 +43,7 @@ const transformRoute = (route, path) => {
   if (route.parameters) {
     let explode = null;
     let style = null;
-    let queryUri = '';
+    let queryURL = '';
 
     // loop on each parameter
     route.parameters.forEach((param) => {
@@ -68,12 +68,12 @@ const transformRoute = (route, path) => {
         example: param.example ? param.example : null,
       };
 
-      // add the param to the URI String (queryUri) --> if param of type query
-      // replace the param in the basicUri with the new param style --> if param of type path
+      // add the param to the URI String (queryURL) --> if param of type query
+      // replace the param in the basicURL with the new param style --> if param of type path
       if (param.in === 'query') {
-        queryUri = `${queryUri}${style.replace('p', paramObj.name)},`;
+        queryURL = `${queryURL}${style.replace('p', paramObj.name)},`;
       } else if (param.in === 'path') {
-        transformedRoute.basicUri = transformedRoute.basicUri.replace(
+        transformedRoute.basicURL = transformedRoute.basicURL.replace(
           paramObj.name,
           style.replace('p', paramObj.name)
         );
@@ -82,9 +82,9 @@ const transformRoute = (route, path) => {
       transformedRoute.parameters.push(paramObj);
     });
 
-    if (queryUri !== '') {
-      queryUri = `{?${queryUri.slice(0, -1)}}`;
-      transformedRoute.basicUri += queryUri;
+    if (queryURL !== '') {
+      queryURL = `{?${queryURL.slice(0, -1)}}`;
+      transformedRoute.basicURL += queryURL;
     }
   }
 
@@ -139,10 +139,11 @@ exports.transformRoutes = async (req, res, next) => {
 
     // later: work on file streams (chunks) instead of looping on whole file
     // if big --> split to chunks and work parallel on each chunck
-    for (let path in oasPaths) {
+    for (const path in oasPaths) {
       routesMap[path] = {};
-      for (let op in oasPaths[path]) {
+      for (const op in oasPaths[path]) {
         routesMap[path][op] = transformRoute(oasPaths[path][op], path);
+        // console.log(routesMap[path][op]);
       }
     }
 

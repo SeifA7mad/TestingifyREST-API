@@ -35,8 +35,8 @@ exports.generateTestSuite = (req, res, next) => {
   const populationKeys = Object.keys(currentPopulation);
   const routesKeys = Object.keys(req.routes);
 
-  console.log('INITIALIZED POPULATION');
-  console.log(currentPopulation);
+  // console.log('INITIALIZED POPULATION');
+  // console.log(currentPopulation);
   //! ....................................................END....................................................................
   for (let fe = 0; fe < mfe; fe++) {
     //! ............................................Employed Bee phase...........................................................
@@ -114,9 +114,9 @@ exports.generateTestSuite = (req, res, next) => {
     }
     //! ....................................................END...................................................................
   }
-  console.log('POPULATION AFTER ALGO.');
-  console.log(currentPopulation);
-  console.log(fitnessValues);
+  // console.log('POPULATION AFTER ALGO.');
+  // console.log(currentPopulation);
+  // console.log(fitnessValues);
   req.testSuite = currentPopulation;
   next();
 };
