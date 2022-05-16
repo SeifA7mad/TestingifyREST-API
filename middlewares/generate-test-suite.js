@@ -19,7 +19,7 @@ const calculateProbabilities = (fitnessValues, maxFit) => {
   return probabilities;
 };
 
-exports.generateTestSuits = (req, res, next) => {
+exports.generateTestSuite = (req, res, next) => {
   //! ............................................Initialization Phase..........................................................
   const populationSize = Object.keys(req.routes).length;
   const trials = new Array(populationSize).fill(0);
