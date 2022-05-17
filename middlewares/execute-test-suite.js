@@ -29,19 +29,17 @@ const executeTestCase = async (
 
   let apikey = '';
   const securityHeaders = {};
-  if (security) {
-    security.forEach((key) => {
-      if (key.in === 'query') {
-        apikey = `&${key.name}=${key.value}`;
-      }
-      if (key.in === 'header') {
-        securityHeaders[key.name] = `${key.prefix} ${key.value}`;
-      }
-      if (key.in === 'cookie') {
-        securityHeaders['Cookie'] = `${key.name}=${key.value}`;
-      }
-    });
-  }
+  security.forEach((key) => {
+    if (key.in === 'query') {
+      apikey = `&${key.name}=${key.value}`;
+    }
+    if (key.in === 'header') {
+      securityHeaders[key.name] = `${key.prefix} ${key.value}`;
+    }
+    if (key.in === 'cookie') {
+      securityHeaders['Cookie'] = `${key.name}=${key.value}`;
+    }
+  });
 
   const reqConfig = {
     method: operation,
@@ -49,8 +47,8 @@ const executeTestCase = async (
     data: propsObj ? propsObj : null,
     headers: securityHeaders,
   };
-  const res = await axios(reqConfig);
-  return res;
+
+  return await axios(reqConfig);
 };
 
 exports.executeTestSuite = (req, res, next) => {

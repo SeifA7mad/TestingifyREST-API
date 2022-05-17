@@ -57,7 +57,6 @@ exports.validateAccessToApi = async (req, res, next) => {
 
     const requiredSecurity = oas.components.securitySchemes;
     const securityMap = new Map();
-
     // console.log(Buffer.from("username:password").toString('base64'));
     // SGVsbG8gV29ybGQ=
     // > console.log(Buffer.from("SGVsbG8gV29ybGQ=", 'base64').toString('ascii'))
@@ -99,9 +98,8 @@ exports.validateAccessToApi = async (req, res, next) => {
         value: req.query[key],
       });
     }
-
-    req.requiredSecurityInfo = securityMap;
     req.server = oas.servers[0].url;
+    req.requiredSecurityInfo = securityMap;
     next();
   } catch (err) {
     next(err);
