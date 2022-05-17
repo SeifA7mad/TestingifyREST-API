@@ -98,7 +98,6 @@ const errorMutation = (chromosome, inputType) => {
     //   ? (newChromosome['expectedStatuscode'] = 400)
     //   : (newChromosome['expectedStatuscode'] = 500);
     newChromosome['mutationApplied'].push(newGenomes.mutationApplied);
-
     return newChromosome;
   }
 
@@ -170,7 +169,9 @@ exports.mutateStructure = (testCase, routeObj) => {
         routeObj[routeKeys[randomOperation]]
       )
     );
-  } else if (mutationStructureType[mutationStructureChoice] === 'removeChromosome') {
+  } else if (
+    mutationStructureType[mutationStructureChoice] === 'removeChromosome'
+  ) {
     const randomChromosomeToBeRemoved = generateRandomInt(
       newTestCase.length - 1
     );

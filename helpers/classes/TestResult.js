@@ -1,12 +1,25 @@
 module.exports = class TestResult {
-    constructor(operation, url, params, props, testType, resStatusCode, mutationApplied) {
-        this.operation = operation;
-        this.url = url;
-        this.params = params;
-        this.props = props;
-        this.expectedStatusCode = testType === 'nominal' ? [200] : [400, 500];
-        this.actualStatusCode = resStatusCode;
-        this.mutationApplied = mutationApplied;
-        this.passed = this.expectedStatusCode.includes(this.expectedStatusCode);  
-    }
-}
+  constructor(
+    operation,
+    url,
+    params,
+    props,
+    testType,
+    resStatusCode,
+    resStatusText,
+    mutationApplied
+  ) {
+    this.operation = operation;
+    this.url = url;
+    this.params = params;
+    this.props = props;
+    this.expectedStatusCode = mutationApplied.length > 0 ? 400 : 200;
+    this.actualStatusCode = resStatusCode;
+    this.statusTest = resStatusText;
+    this.mutationApplied = mutationApplied;
+    this.passed =
+      this.actualStatusCode >= this.expectedStatusCode &&
+      this.actualStatusCode <
+        this.expectedStatusCode + (this.expectedStatusCode === 200 ? 300 : 600);
+  }
+};

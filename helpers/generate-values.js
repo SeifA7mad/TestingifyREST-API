@@ -38,8 +38,8 @@ const generateNominalValue = (typeSchema) => {
 
   if (typeSchema.type === 'number' || typeSchema.type === 'integer') {
     return generateRandomInt(
-      typeSchema.maximum ? typeSchema.maximum : 0,
-      typeSchema.minimum ? typeSchema.minimum : 0
+      typeSchema.maximum ? typeSchema.maximum : 1,
+      typeSchema.minimum ? typeSchema.minimum : 50
     );
   }
 

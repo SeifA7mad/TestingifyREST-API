@@ -12,15 +12,13 @@ const executeTestCase = async (
   let reqURL = requestURL;
   const URLTemplate = parse(reqURL);
 
-  if (testInputs.params.length > 0) {
-    const paramsObj = {};
-    testInputs.params.forEach((param) => {
-      paramsObj[param.name] = param.value;
-    });
-    reqURL = URLTemplate.expand(paramsObj);
-  }
+  const paramsObj = {};
+  testInputs.params.forEach((param) => {
+    paramsObj[param.name] = param.value;
+  });
+  reqURL = URLTemplate.expand(paramsObj);
 
-  const propsObj = null;
+  let propsObj = null;
   if (testInputs.props.length > 0) {
     propsObj = {};
     testInputs.props.forEach((prop) => {
@@ -44,7 +42,7 @@ const executeTestCase = async (
 
   const reqConfig = {
     method: operation,
-    url: `${serverURL}${reqURL}${apikey}`,
+    url: `${serverURL.slice(0, -1)}${reqURL}${apikey}`,
     data: propsObj ? propsObj : null,
     headers: securityHeaders,
   };
@@ -52,7 +50,7 @@ const executeTestCase = async (
   return await axios(reqConfig);
 };
 
-exports.executeTestSuite = (req, res, next) => {
+exports.executeTestSuite = async (req, res, next) => {
   const testSuite = req.testSuite;
   const generalRequiredSecurity = req.requiredGeneralSecurity;
   const testingSuiteResults = {};
@@ -65,6 +63,8 @@ exports.executeTestSuite = (req, res, next) => {
       const params = testRequest.parameters;
       const props = testRequest.properties;
       const op = testRequest.operation;
+      const testType = testRequest.testType;
+      const mutationApplied = testRequest.mutationApplied;
       const requestURL = req.routes[testSuiteRoute][op].basicURL;
       const requiredSecurity = req.routes[testSuiteRoute][op].requiredSecurity
         ? req.routes[testSuiteRoute][op].requiredSecurity
@@ -77,19 +77,46 @@ exports.executeTestSuite = (req, res, next) => {
         });
       }
 
-      executeTestCase(req.server, requestURL, { params, props }, op, security)
-        .then((res) => {
-          console.log(res);
-          // testingSuiteResults[testSuiteRoute].push(new TestResult(op, ));
-        })
-        .catch((err) => {
-          if (err.response) {
-            console.log(err.response.status);
-            console.log(err.response.statusText);
-            console.log(testRequest.mutationApplied);
-          }
-        });
+      try {
+        const res = await executeTestCase(
+          req.server,
+          requestURL,
+          { params, props },
+          op,
+          security
+        );
+        testingSuiteResults[testSuiteRoute].push(
+          new TestResult(
+            op,
+            res.request.path,
+            params,
+            props,
+            testType,
+            res.status,
+            res.statusText,
+            mutationApplied
+          )
+        );
+      } catch (err) {
+        if (err.response) {
+          testingSuiteResults[testSuiteRoute].push(
+            new TestResult(
+              op,
+              err.request.path,
+              params,
+              props,
+              testType,
+              err.response.status,
+              err.response.statusText,
+              mutationApplied
+            )
+          );
+        }
+      }
     }
   }
+
+  req.testSuiteResults = testingSuiteResults;
+  console.log(testingSuiteResults);
   next();
 };
