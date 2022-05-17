@@ -1,5 +1,6 @@
 const axios = require('axios').default;
 const { parse } = require('uri-template');
+const TestResult = require('../helpers/classes/TestResult');
 
 const executeTestCase = async (
   serverURL,
@@ -54,9 +55,11 @@ const executeTestCase = async (
 exports.executeTestSuite = (req, res, next) => {
   const testSuite = req.testSuite;
   const generalRequiredSecurity = req.requiredGeneralSecurity;
+  const testingSuiteResults = {};
 
   for (const testSuiteRoute in testSuite) {
     const testCase = testSuite[testSuiteRoute].testCase;
+    testingSuiteResults[testSuiteRoute] = [];
 
     for (const testRequest of testCase) {
       const params = testRequest.parameters;
@@ -73,11 +76,11 @@ exports.executeTestSuite = (req, res, next) => {
           security.push(req.requiredSecurityInfo.get(Object.keys(key)[0]));
         });
       }
-      
+
       executeTestCase(req.server, requestURL, { params, props }, op, security)
         .then((res) => {
-          console.log(res.status);
-          console.log(res.data);
+          console.log(res);
+          // testingSuiteResults[testSuiteRoute].push(new TestResult(op, ));
         })
         .catch((err) => {
           if (err.response) {
