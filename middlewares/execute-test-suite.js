@@ -34,7 +34,7 @@ const executeTestCase = async (
       apikey = `&${key.name}=${key.value}`;
     }
     if (key.in === 'header') {
-      securityHeaders[key.name] = `${key.prefix} ${key.value}`;
+      securityHeaders[key.name] = `${key.prefix}${key.value}`;
     }
     if (key.in === 'cookie') {
       securityHeaders['Cookie'] = `${key.name}=${key.value}`;
@@ -73,7 +73,7 @@ exports.executeTestSuite = (req, res, next) => {
           security.push(req.requiredSecurityInfo.get(Object.keys(key)[0]));
         });
       }
-
+      
       executeTestCase(req.server, requestURL, { params, props }, op, security)
         .then((res) => {
           console.log(res.status);

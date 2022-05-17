@@ -146,19 +146,7 @@ exports.transformRoutes = async (req, res, next) => {
         // console.log(routesMap[path][op]);
       }
     }
-
-    // .post['/meals'].requestBody[0].content
-    // .get['/meals'].parameters[0].jsonSchema
-    // ['/maps/api/elevation/json']['get'].parameters
-    // ['/meals/{id}']['delete'].parameters
-    // console.log(routesMap['/meals']['get'].parameters);
-    // routesMap['/meals']['get'].outputs
-    // routesMap['/meals']['post'].requestBody
-    // routesMap['/weather'].get
-    // console.log(
-    //   routesMap[Object.keys(routesMap)[0]].post.requestBody.properties
-    // );
-
+    
     req.routes = routesMap;
     req.requiredGeneralSecurity = oas.security ? oas.security : null;
     next();
