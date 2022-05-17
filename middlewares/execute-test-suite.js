@@ -30,7 +30,6 @@ const executeTestCase = async (
   let apikey = '';
   const securityHeaders = {};
   if (security) {
-    console.log(security);
     security.forEach((key) => {
       if (key.in === 'query') {
         apikey = `&${key.name}=${key.value}`;
@@ -51,7 +50,7 @@ const executeTestCase = async (
     headers: securityHeaders,
   };
   const res = await axios(reqConfig);
-  return await res.json();
+  return res;
 };
 
 exports.executeTestSuite = (req, res, next) => {
@@ -78,11 +77,16 @@ exports.executeTestSuite = (req, res, next) => {
       }
 
       executeTestCase(req.server, requestURL, { params, props }, op, security)
-        .then((data) => {
-          console.log(data);
+        .then((res) => {
+          console.log(res.status);
+          console.log(res.data);
         })
         .catch((err) => {
-          console.log(err.response);
+          if (err.response) {
+            console.log(err.response.status);
+            console.log(err.response.statusText);
+            console.log(testRequest.mutationApplied);
+          }
         });
     }
   }
