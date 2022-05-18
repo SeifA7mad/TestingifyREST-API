@@ -19,7 +19,6 @@ module.exports = class TestResult {
     this.mutationApplied = mutationApplied;
     this.passed =
       this.actualStatusCode >= this.expectedStatusCode &&
-      this.actualStatusCode <
-        this.expectedStatusCode + (this.expectedStatusCode === 200 ? 300 : 600);
+      this.actualStatusCode < (this.expectedStatusCode === 200 ? 300 : 600);
   }
 };

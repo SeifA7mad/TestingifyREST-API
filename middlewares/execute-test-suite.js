@@ -30,7 +30,9 @@ const executeTestCase = async (
   const securityHeaders = {};
   security.forEach((key) => {
     if (key.in === 'query') {
-      apikey = `&${key.name}=${key.value}`;
+      apikey = reqURL.includes('?')
+        ? `&${key.name}=${key.value}`
+        : `?${key.name}=${key.value}`;
     }
     if (key.in === 'header') {
       securityHeaders[key.name] = `${key.prefix}${key.value}`;
@@ -117,6 +119,5 @@ exports.executeTestSuite = async (req, res, next) => {
   }
 
   req.testSuiteResults = testingSuiteResults;
-  console.log(testingSuiteResults);
   next();
 };

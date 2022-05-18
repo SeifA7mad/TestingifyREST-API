@@ -128,6 +128,7 @@ exports.removeRequiredInput = (genomes) => {
 };
 
 exports.mutateInputType = (genomes) => {
+  return null;
   // copy the genomes to edit it later
   const newGenomes = [...genomes];
 
