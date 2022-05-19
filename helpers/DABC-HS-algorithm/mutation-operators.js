@@ -128,7 +128,6 @@ exports.removeRequiredInput = (genomes) => {
 };
 
 exports.mutateInputType = (genomes) => {
-  return null;
   // copy the genomes to edit it later
   const newGenomes = [...genomes];
 
@@ -162,7 +161,7 @@ exports.mutateInputType = (genomes) => {
 
   const mutationApplied = {
     inputName: newGenomes[randomFilteredInputIndex].name,
-    txt: `The mutation operation mutated the input value from "${oldValue}" to "${newGenomes[randomFilteredInputIndex].value}"`,
+    txt: `The mutation operation mutated the input value from ${oldValue} to ${newGenomes[randomFilteredInputIndex].value}`,
   };
 
   return { genomes: newGenomes, mutationApplied };
@@ -200,7 +199,7 @@ exports.constraintViolation = (genomes) => {
 
   const mutationApplied = {
     inputName: newGenomes[randomFilteredInputIndex].name,
-    txt: `The mutation operation violated the input value from "${oldValue}" to "${newGenomes[randomFilteredInputIndex].value}"`,
+    txt: `The mutation operation violated the input value from ${oldValue} to ${newGenomes[randomFilteredInputIndex].value}`,
   };
 
   return { genomes: newGenomes, mutationApplied };
