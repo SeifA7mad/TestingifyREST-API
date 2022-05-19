@@ -61,7 +61,9 @@ exports.addNewInput = (genomes, operationgenomes) => {
   }
 
   // choose a random input from newGenomesToBeAdded to add it into genomes
-  const randomNewInputChoice = generateRandomInt(newGenomesToBeAdded.length - 1);
+  const randomNewInputChoice = generateRandomInt(
+    newGenomesToBeAdded.length - 1
+  );
 
   // add a new input object into newGenomes
   newGenomes.push(

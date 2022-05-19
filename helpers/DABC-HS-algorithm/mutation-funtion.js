@@ -85,7 +85,7 @@ const errorMutation = (chromosome, inputType) => {
         ? mutateInputType(chromosome[inputType])
         : constraintViolation(chromosome[inputType]);
 
-    if (!newGenomes) {
+    if (newGenomes === null) {
       editableMutationOperator.splice(
         editableMutationOperator.indexOf(mutationOP),
         1
