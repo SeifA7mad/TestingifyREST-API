@@ -10,7 +10,7 @@ const Genome = require('../classes/Genome');
 
 exports.changeFiniteValue = (genomes) => {
   // copy the genomes to edit it later
-  const newGenomes = JSON.parse(JSON.stringify(genomes));
+  const newGenomes = structuredClone(genomes);
 
   // map only finite values (isFinite = true) then filter the undefined values keeping only the indexes of finite genomes
   const finiteValuesIndex = genomes
@@ -45,7 +45,7 @@ exports.changeFiniteValue = (genomes) => {
 
 exports.addNewInput = (genomes, operationgenomes) => {
   // copy the genomes to edit it later
-  const newGenomes = JSON.parse(JSON.stringify(genomes));
+  const newGenomes = structuredClone(genomes);
 
   // map the genomes name into an array
   const usedgenomesNames = genomes.map((input) => input.name);
@@ -80,7 +80,7 @@ exports.addNewInput = (genomes, operationgenomes) => {
 
 exports.removeNonRequiredInput = (genomes) => {
   // copy the genomes to edit it later
-  const newGenomes = JSON.parse(JSON.stringify(genomes));
+  const newGenomes = structuredClone(genomes);
 
   // map only non-required genomes (required = false) then filter the undefined values keeping only the non-required genomes indexes
   const nonRequiredgenomesIndex = genomes
@@ -104,7 +104,7 @@ exports.removeNonRequiredInput = (genomes) => {
 
 exports.removeRequiredInput = (genomes) => {
   // copy the genomes to edit it later
-  const newGenomes = JSON.parse(JSON.stringify(genomes));
+  const newGenomes = structuredClone(genomes);
   // map only required genomes (required = true) then filter the undefined values keeping only the non-required genomes indexes
   const requiredgenomesIndex = genomes
     .map((input, index) => (input.required ? index : undefined))
@@ -128,7 +128,7 @@ exports.removeRequiredInput = (genomes) => {
 
 exports.mutateInputType = (genomes) => {
   // copy the genomes to edit it later
-  const newGenomes = JSON.parse(JSON.stringify(genomes));
+  const newGenomes = structuredClone(genomes);
 
   // map&filter only string or number or integer or enum genomes and save thier indexes
   const filteredgenomesIndex = genomes
@@ -168,7 +168,7 @@ exports.mutateInputType = (genomes) => {
 
 exports.constraintViolation = (genomes) => {
   // copy the genomes to edit it later
-  const newGenomes = JSON.parse(JSON.stringify(genomes));
+  const newGenomes = structuredClone(genomes);
 
   const filteredgenomesIndex = genomes
     .map((input, index) => {

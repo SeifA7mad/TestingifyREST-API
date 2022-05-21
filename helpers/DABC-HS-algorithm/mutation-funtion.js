@@ -105,7 +105,7 @@ const errorMutation = (chromosome, inputType) => {
 };
 
 exports.mutate = (testCase, routeObj, MR = 0.5) => {
-  const newTestCase = JSON.parse(JSON.stringify(testCase));
+  const newTestCase = structuredClone(testCase);
 
   // loop on every Chromosome in the Test Case
   for (let i = 0; i < newTestCase.length; i++) {
@@ -159,7 +159,7 @@ exports.mutate = (testCase, routeObj, MR = 0.5) => {
 };
 
 exports.mutateStructure = (testCase, routeObj) => {
-  const newTestCase = JSON.parse(JSON.stringify(testCase));
+  const newTestCase = structuredClone(testCase);
 
   // choose random mutation structure type => (addChromosome or removeChromosome)
   const mutationStructureChoice = generateRandomInt(
