@@ -106,12 +106,12 @@ exports.removeNonRequiredInput = (genomes) => {
 exports.removeRequiredInput = (genomes) => {
   // copy the genomes to edit it later
   const newGenomes = [...genomes];
-  // map only non-required genomes (required = false) then filter the undefined values keeping only the non-required genomes indexes
+  // map only required genomes (required = true) then filter the undefined values keeping only the non-required genomes indexes
   const requiredgenomesIndex = genomes
     .map((input, index) => (input.required ? index : undefined))
     .filter((input) => input !== undefined);
 
-  // if all the genomes is required => null
+  // if all the genomes is non-required => null
   if (requiredgenomesIndex.length <= 0) {
     return null;
   }

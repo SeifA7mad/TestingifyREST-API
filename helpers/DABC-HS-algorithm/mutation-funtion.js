@@ -97,7 +97,7 @@ const errorMutation = (chromosome, inputType) => {
     // mutationOP === 'missingRequired'
     //   ? (newChromosome['expectedStatuscode'] = 400)
     //   : (newChromosome['expectedStatuscode'] = 500);
-    newChromosome['mutationApplied'].push(newGenomes.mutationApplied);
+    newChromosome['mutationApplied'] = newGenomes.mutationApplied;
     return newChromosome;
   }
 
@@ -108,7 +108,7 @@ exports.mutate = (testCase, routeObj, MR = 0.5) => {
   const newTestCase = [...testCase];
 
   // loop on every Chromosome in the Test Case
-  for (let i = 0; i < testCase.length; i++) {
+  for (let i = 0; i < newTestCase.length; i++) {
     // if random number > MR (mutation rate) => ignore (exclude) this chromosome from mutation
     if (Math.random() > MR) {
       continue;
@@ -124,27 +124,31 @@ exports.mutate = (testCase, routeObj, MR = 0.5) => {
     // routeObj[testCase[i].operation] =(standsfor)> access the current original operation from route object by the current operation name from the chromosome
     const inputType =
       inputTypes[
-        routeObj[testCase[i].operation].parameters.length > 0 &&
-        routeObj[testCase[i].operation].requestBody !== null
+        routeObj[newTestCase[i].operation].parameters.length > 0 &&
+        routeObj[newTestCase[i].operation].requestBody !== null
           ? generateRandomInt(inputTypes.length - 1)
-          : routeObj[testCase[i].operation].requestBody !== null
+          : routeObj[newTestCase[i].operation].requestBody !== null
           ? 1
           : 0
       ];
 
     const operationInput =
       inputType === 'properties'
-        ? routeObj[testCase[i].operation].requestBody.properties
-        : routeObj[testCase[i].operation].parameters;
+        ? routeObj[newTestCase[i].operation].requestBody.properties
+        : routeObj[newTestCase[i].operation].parameters;
 
     // if mutation type == 'nominal testing' the test case (chromosome) must be of type nominal to be able to perform nominal mutation
     if (
       mutationType[mutationTypeChoice] === 'nominalTesting' &&
-      testCase[i].mutationApplied.length === 0
+      newTestCase[i].testType === 'nominal'
     ) {
-      newTestCase[i] = nominalMutation(testCase[i], operationInput, inputType);
-    } else if (testCase[i].mutationApplied.length === 0) {
-      newTestCase[i] = errorMutation(testCase[i], inputType);
+      newTestCase[i] = nominalMutation(
+        newTestCase[i],
+        operationInput,
+        inputType
+      );
+    } else if (newTestCase[i].testType === 'nominal') {
+      newTestCase[i] = errorMutation(newTestCase[i], inputType);
     }
   }
 
