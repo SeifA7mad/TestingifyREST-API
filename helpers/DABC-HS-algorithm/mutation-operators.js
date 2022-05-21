@@ -75,7 +75,6 @@ exports.addNewInput = (genomes, operationgenomes) => {
       isFinite(newGenomesToBeAdded[randomNewInputChoice].schema)
     )
   );
-
   return newGenomes;
 };
 

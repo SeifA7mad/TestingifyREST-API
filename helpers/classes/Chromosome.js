@@ -12,7 +12,7 @@ module.exports = class Chromosome {
     this.testType = testType;
     this.parameters = parameters;
     this.properties = properties;
-    this.mutationApplied = null;
+    this.mutationApplied = [];
   }
 
   static generateChromosome = (operationName, testType, operatrionObj) => {

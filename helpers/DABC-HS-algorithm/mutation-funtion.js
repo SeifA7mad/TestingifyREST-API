@@ -47,7 +47,7 @@ const nominalMutation = (chromosome, operationInputs, inputType) => {
         : mutationOP === 'addNewInput'
         ? addNewInput(chromosome[inputType], operationInputs)
         : removeNonRequiredInput(chromosome[inputType]);
-    if (!newGenomes) {
+    if (newGenomes === null) {
       editableMutationOperator.splice(
         editableMutationOperator.indexOf(mutationOP),
         1
@@ -97,7 +97,7 @@ const errorMutation = (chromosome, inputType) => {
     // mutationOP === 'missingRequired'
     //   ? (newChromosome['expectedStatuscode'] = 400)
     //   : (newChromosome['expectedStatuscode'] = 500);
-    newChromosome['mutationApplied'] = newGenomes.mutationApplied;
+    newChromosome['mutationApplied'].push(newGenomes.mutationApplied);
     return newChromosome;
   }
 
@@ -140,14 +140,17 @@ exports.mutate = (testCase, routeObj, MR = 0.5) => {
     // if mutation type == 'nominal testing' the test case (chromosome) must be of type nominal to be able to perform nominal mutation
     if (
       mutationType[mutationTypeChoice] === 'nominalTesting' &&
-      newTestCase[i].testType === 'nominal'
+      newTestCase[i].mutationApplied.length < 1
     ) {
       newTestCase[i] = nominalMutation(
         newTestCase[i],
         operationInput,
         inputType
       );
-    } else if (newTestCase[i].testType === 'nominal') {
+    } else if (
+      mutationType[mutationTypeChoice] === 'mutationTesting' &&
+      newTestCase[i].mutationApplied.length < 1
+    ) {
       newTestCase[i] = errorMutation(newTestCase[i], inputType);
     }
   }

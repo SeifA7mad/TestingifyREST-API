@@ -99,6 +99,7 @@ exports.validateAccessToApi = async (req, res, next) => {
       });
     }
     req.server = oas.servers[0].url;
+
     req.requiredSecurityInfo = securityMap;
     next();
   } catch (err) {
