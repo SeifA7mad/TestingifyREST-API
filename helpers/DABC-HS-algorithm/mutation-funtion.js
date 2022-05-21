@@ -70,7 +70,7 @@ const errorMutation = (chromosome, inputType) => {
   const editableMutationOperator = [...errorMutationOperator];
 
   while (editableMutationOperator.length > 0) {
-    mutationOP =
+    const mutationOP =
       editableMutationOperator[
         generateRandomInt(editableMutationOperator.length - 1)
       ];

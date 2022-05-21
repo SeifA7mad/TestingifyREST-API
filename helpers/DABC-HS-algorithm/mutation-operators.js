@@ -106,7 +106,6 @@ exports.removeNonRequiredInput = (genomes) => {
 exports.removeRequiredInput = (genomes) => {
   // copy the genomes to edit it later
   const newGenomes = [...genomes];
-
   // map only non-required genomes (required = false) then filter the undefined values keeping only the non-required genomes indexes
   const requiredgenomesIndex = genomes
     .map((input, index) => (input.required ? index : undefined))
@@ -125,7 +124,6 @@ exports.removeRequiredInput = (genomes) => {
     txt: `The mutation operation removed a required input`,
   };
   newGenomes.splice(randomRequiredInputIndex, 1);
-
   return { genomes: newGenomes, mutationApplied };
 };
 
