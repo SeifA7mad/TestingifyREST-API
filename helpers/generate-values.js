@@ -77,7 +77,7 @@ const generateViolationValue = (typeSchema) => {
 
   if (typeSchema.type === 'number' || typeSchema.type === 'integer') {
     return generateRandomInt(
-      typeSchema.maximum + Math.pow(2, typeSchema.minimum)
+      typeSchema.maximum + Math.pow(2, typeSchema.minimum + 1)
     );
   }
 

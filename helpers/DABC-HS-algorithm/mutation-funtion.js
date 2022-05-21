@@ -140,10 +140,10 @@ exports.mutate = (testCase, routeObj, MR = 0.5) => {
     // if mutation type == 'nominal testing' the test case (chromosome) must be of type nominal to be able to perform nominal mutation
     if (
       mutationType[mutationTypeChoice] === 'nominalTesting' &&
-      testCase[i].testType === 'nominal'
+      testCase[i].mutationApplied.length === 0
     ) {
       newTestCase[i] = nominalMutation(testCase[i], operationInput, inputType);
-    } else {
+    } else if (testCase[i].mutationApplied.length === 0) {
       newTestCase[i] = errorMutation(testCase[i], inputType);
     }
   }
