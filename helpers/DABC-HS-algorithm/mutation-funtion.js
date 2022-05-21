@@ -93,7 +93,7 @@ const errorMutation = (chromosome, inputType) => {
       continue;
     }
     newChromosome[inputType] = newGenomes.genomes;
-    newChromosome['testType'] = 'mutation';
+    newChromosome.testType = 'mutation';
     // mutationOP === 'missingRequired'
     //   ? (newChromosome['expectedStatuscode'] = 400)
     //   : (newChromosome['expectedStatuscode'] = 500);
@@ -105,7 +105,7 @@ const errorMutation = (chromosome, inputType) => {
 };
 
 exports.mutate = (testCase, routeObj, MR = 0.5) => {
-  const newTestCase = [...testCase];
+  const newTestCase = JSON.parse(JSON.stringify(testCase));
 
   // loop on every Chromosome in the Test Case
   for (let i = 0; i < newTestCase.length; i++) {
@@ -140,7 +140,7 @@ exports.mutate = (testCase, routeObj, MR = 0.5) => {
     // if mutation type == 'nominal testing' the test case (chromosome) must be of type nominal to be able to perform nominal mutation
     if (
       mutationType[mutationTypeChoice] === 'nominalTesting' &&
-      newTestCase[i].mutationApplied.length < 1
+      newTestCase[i].testType == 'nominal'
     ) {
       newTestCase[i] = nominalMutation(
         newTestCase[i],
@@ -149,7 +149,7 @@ exports.mutate = (testCase, routeObj, MR = 0.5) => {
       );
     } else if (
       mutationType[mutationTypeChoice] === 'mutationTesting' &&
-      newTestCase[i].mutationApplied.length < 1
+      newTestCase[i].testType == 'nominal'
     ) {
       newTestCase[i] = errorMutation(newTestCase[i], inputType);
     }
@@ -159,7 +159,7 @@ exports.mutate = (testCase, routeObj, MR = 0.5) => {
 };
 
 exports.mutateStructure = (testCase, routeObj) => {
-  const newTestCase = [...testCase];
+  const newTestCase = JSON.parse(JSON.stringify(testCase));
 
   // choose random mutation structure type => (addChromosome or removeChromosome)
   const mutationStructureChoice = generateRandomInt(
