@@ -116,7 +116,7 @@ exports.removeRequiredInput = (genomes) => {
     return null;
   }
 
-  // choose a random non-required input index to remove it
+  // choose a random required input index to remove it
   const randomRequiredInputIndex =
     requiredgenomesIndex[generateRandomInt(requiredgenomesIndex.length - 1)];
   const mutationApplied = {
