@@ -147,10 +147,7 @@ exports.mutate = (testCase, routeObj, MR = 0.5) => {
         operationInput,
         inputType
       );
-    } else if (
-      mutationType[mutationTypeChoice] === 'mutationTesting' &&
-      newTestCase[i].testType == 'nominal'
-    ) {
+    } else if (mutationType[mutationTypeChoice] === 'mutationTesting') {
       newTestCase[i] = errorMutation(newTestCase[i], inputType);
     }
   }

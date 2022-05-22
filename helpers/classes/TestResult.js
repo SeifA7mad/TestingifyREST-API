@@ -13,8 +13,8 @@ module.exports = class TestResult {
     this.url = url;
     this.params = params;
     this.props = props;
-    this.testType = mutationApplied.length > 0 ? 'Mutation Testing' : 'Nominal Testing';
-    this.expectedStatusCode = mutationApplied.length > 0 ? 400 : 200;
+    this.testType = `${testType.toUpperCase()} Testing`;
+    this.expectedStatusCode = testType === 'mutation' ? 400 : 200;
     this.actualStatusCode = resStatusCode;
     this.statusTest = resStatusText;
     this.mutationApplied = mutationApplied;
