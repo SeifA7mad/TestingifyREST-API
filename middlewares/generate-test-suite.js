@@ -35,6 +35,8 @@ exports.generateTestSuite = (req, res, next) => {
   const populationKeys = Object.keys(currentPopulation);
   const routesKeys = Object.keys(req.routes);
 
+  const sumFitnessValues = [];
+
   // console.log('INITIALIZED POPULATION');
   // console.log(currentPopulation);
   //! ....................................................END....................................................................
@@ -113,10 +115,14 @@ exports.generateTestSuite = (req, res, next) => {
       );
     }
     //! ....................................................END...................................................................
+    sumFitnessValues.push(
+      fitnessValues.reduce((prev, cur) => prev + cur, 0)
+    );
   }
   // console.log('POPULATION AFTER ALGO.');
   // console.log(currentPopulation);
   // console.log(fitnessValues);
   req.testSuite = currentPopulation;
+  req.fitnessValues = sumFitnessValues;
   next();
 };
