@@ -25,16 +25,17 @@ exports.generateTestSuite = (req, res, next) => {
   const trials = new Array(populationSize).fill(0);
   const fitnessValues = new Array(populationSize);
   // maximum number of fitness evaluations
-  const mfe = 50;
+  const mfe = 100;
   // maximum value of fitness function
   const mfv = populationSize * 5;
   // The maximum number of the trials to determine exhausted sources
-  const limit = 5;
+  const limit = 10;
   // first population => currentPopulation
   const currentPopulation = initializeFoodSources(req.routes);
   const populationKeys = Object.keys(currentPopulation);
   const routesKeys = Object.keys(req.routes);
 
+  const archive = [];
   const sumFitnessValues = [];
 
   // console.log('INITIALIZED POPULATION');
@@ -105,6 +106,14 @@ exports.generateTestSuite = (req, res, next) => {
         }
       }
 
+      archive.push({
+        testCaseIndex: maxTrailIndex,
+        testCase: structuredClone(
+          currentPopulation[populationKeys[maxTrailIndex]]
+        ),
+        fitnessValue: fitnessValues[maxTrailIndex],
+      });
+
       currentPopulation[populationKeys[maxTrailIndex]] = initializeFoodSource(
         req.routes[routesKeys[maxTrailIndex]]
       );
@@ -115,10 +124,24 @@ exports.generateTestSuite = (req, res, next) => {
       );
     }
     //! ....................................................END...................................................................
-    sumFitnessValues.push(
-      fitnessValues.reduce((prev, cur) => prev + cur, 0)
-    );
+    sumFitnessValues.push(fitnessValues.reduce((prev, cur) => prev + cur, 0));
   }
+
+  // check for better solutions in archive
+  let isReplaced = false;
+  archive.forEach((testCase) => {
+    if (testCase.fitnessValue > fitnessValues[testCase.testCaseIndex]) {
+      currentPopulation[populationKeys[testCase.testCaseIndex]] =
+        structuredClone(testCase.testCase);
+      fitnessValues[testCase.testCaseIndex] = testCase.fitnessValue;
+      isReplaced = true;
+    }
+  });
+
+  if (isReplaced) {
+    sumFitnessValues.push(fitnessValues.reduce((prev, cur) => prev + cur, 0));
+  }
+
   // console.log('POPULATION AFTER ALGO.');
   // console.log(currentPopulation);
   // console.log(fitnessValues);
