@@ -25,7 +25,7 @@ exports.generateTestSuite = (req, res, next) => {
   const trials = new Array(populationSize).fill(0);
   const fitnessValues = new Array(populationSize);
   // maximum number of fitness evaluations
-  const mfe = 100;
+  const mfe = 50;
   // maximum value of fitness function
   const mfv = populationSize * 5;
   // The maximum number of the trials to determine exhausted sources

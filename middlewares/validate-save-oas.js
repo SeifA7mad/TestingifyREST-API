@@ -81,7 +81,7 @@ exports.validateAccessToApi = async (req, res, next) => {
 
       // validate => all the required authorization protocols has given values in query params
       if (
-        Object.keys(req.query).length !== Object.keys(requiredSecurity).length
+        Object.keys(req.body).length !== Object.keys(requiredSecurity).length
       ) {
         const error = new Error(
           `unauthorized, secuirty info: ${key} required.`
@@ -100,7 +100,7 @@ exports.validateAccessToApi = async (req, res, next) => {
         ...authorizationProtocol[
           securityType === 'apiKey' ? 'apikeyauth' : key.toLowerCase()
         ],
-        value: req.query[key],
+        value: req.body[key],
       });
     }
     req.server = oas.servers[0].url;
