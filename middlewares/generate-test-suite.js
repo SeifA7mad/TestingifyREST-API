@@ -127,6 +127,7 @@ exports.generateTestSuite = (req, res, next) => {
     sumFitnessValues.push(fitnessValues.reduce((prev, cur) => prev + cur, 0));
   }
 
+  //! ............................................Hyper-Scout Bee phase..............................................................
   // check for better solutions in archive
   let isReplaced = false;
   archive.forEach((testCase) => {
@@ -141,6 +142,7 @@ exports.generateTestSuite = (req, res, next) => {
   if (isReplaced) {
     sumFitnessValues.push(fitnessValues.reduce((prev, cur) => prev + cur, 0));
   }
+  //! ....................................................END...................................................................
 
   // console.log('POPULATION AFTER ALGO.');
   // console.log(currentPopulation);
