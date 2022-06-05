@@ -16,7 +16,7 @@ module.exports = class TestResult {
     this.testType = `${testType.toUpperCase()} Testing`;
     this.expectedStatusCode = testType === 'mutation' ? 400 : 200;
     this.actualStatusCode = resStatusCode;
-    this.statusTest = resStatusText;
+    this.statusText = resStatusText;
     this.mutationApplied = mutationApplied;
     this.passed =
       this.actualStatusCode >= this.expectedStatusCode &&
