@@ -5,5 +5,6 @@ exports.postTestApi = (req, res, next) => {
     .json({
       testResults: req.testSuiteResults,
       fitnessValues: req.fitnessValues,
+      sumFitnessValues: req.sumFitnessValues
     });
 };

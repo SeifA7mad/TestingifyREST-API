@@ -148,6 +148,7 @@ exports.generateTestSuite = (req, res, next) => {
   // console.log(currentPopulation);
   // console.log(fitnessValues);
   req.testSuite = currentPopulation;
-  req.fitnessValues = sumFitnessValues;
+  req.fitnessValues = fitnessValues;
+  req.sumFitnessValues = sumFitnessValues;
   next();
 };
