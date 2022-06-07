@@ -68,11 +68,11 @@ exports.fitness = (testCase, numbers) => {
   // ).size;
   // const mutatedParameterCoverage =
   //   numberOfMutatedInputs / numbers.totalNumberOfInputs;
-
-  return +(fitnessValue =
+  const fitnessValue =
     operationCoverage +
     parameterCoverage +
     inputValueCoverage +
-    statusCodeCoverage -
-    testCaseSizeCoverage).toFixed(4);
+    statusCodeCoverage;
+
+  return +(fitnessValue - testCaseSizeCoverage).toFixed(4);
 };

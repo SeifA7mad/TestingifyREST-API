@@ -126,7 +126,7 @@ exports.generateTestSuite = (req, res, next) => {
     //! ....................................................END...................................................................
     sumFitnessValues.push(fitnessValues.reduce((prev, cur) => prev + cur, 0));
     if (sumFitnessValues[sumFitnessValues.length - 1] >= mfv) {
-      return;
+      break;
     }
   }
 
