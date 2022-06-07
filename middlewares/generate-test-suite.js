@@ -27,9 +27,9 @@ exports.generateTestSuite = (req, res, next) => {
   // maximum number of fitness evaluations
   const mfe = 100;
   // maximum value of fitness function
-  const mfv = populationSize * 5;
-  // The maximum number of the trials to determine exhausted sources
-  const limit = 10;
+  const mfv = populationSize * 3.5;
+  // The maximum number of the trials to determine exhausted sources -> Np x D
+  const limit = populationSize * 5;
   // first population => currentPopulation
   const currentPopulation = initializeFoodSources(req.routes);
   const populationKeys = Object.keys(currentPopulation);
@@ -125,6 +125,9 @@ exports.generateTestSuite = (req, res, next) => {
     }
     //! ....................................................END...................................................................
     sumFitnessValues.push(fitnessValues.reduce((prev, cur) => prev + cur, 0));
+    if (sumFitnessValues[sumFitnessValues.length - 1] >= mfv) {
+      return;
+    }
   }
 
   //! ............................................Hyper-Scout Bee phase..............................................................
