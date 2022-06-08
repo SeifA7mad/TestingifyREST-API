@@ -12,7 +12,8 @@ const testingMiddlewares = [
   validateSaveOas.validateAccessToApi,
   analyseOas.transformRoutes,
   generateTestSuits.generateTestSuite,
-  executeTestSuite.executeTestSuite,
+  //! Send Algo. results without executing test cases
+  //executeTestSuite.executeTestSuite,
 ];
 
 router.post('/testapi', testingMiddlewares, testapiController.postTestApi);
