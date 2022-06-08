@@ -35,7 +35,7 @@ exports.generateTestSuite = (req, res, next) => {
   const populationKeys = Object.keys(currentPopulation);
   const routesKeys = Object.keys(req.routes);
 
-  const archive = [];
+  const archive = new Array(populationSize);
   const sumFitnessValues = [];
 
   // console.log('INITIALIZED POPULATION');
@@ -106,13 +106,18 @@ exports.generateTestSuite = (req, res, next) => {
         }
       }
 
-      archive.push({
-        testCaseIndex: maxTrailIndex,
-        testCase: structuredClone(
-          currentPopulation[populationKeys[maxTrailIndex]]
-        ),
-        fitnessValue: fitnessValues[maxTrailIndex],
-      });
+      // calaculate the fitness value of the test case in the archive & the current test case in the current population
+      const archivedFitnessValue = archive[maxTrailIndex] ? fitness(archive[maxTrailIndex].testCase, archive[maxTrailIndex].numbers) : 0;
+      const currentFitnessvalue = fitness(
+        currentPopulation[populationKeys[maxTrailIndex]]['testCase'],
+        currentPopulation[populationKeys[maxTrailIndex]]['numbers']
+      );
+      
+      // if the current fitness value > archived fitness value => replace in the archive => for the Hyper-Scout Bee
+      if (currentFitnessvalue > archivedFitnessValue) {
+        archive[maxTrailIndex] =
+          structuredClone(currentPopulation[populationKeys[maxTrailIndex]]);
+      }
 
       currentPopulation[populationKeys[maxTrailIndex]] = initializeFoodSource(
         req.routes[routesKeys[maxTrailIndex]]
@@ -133,14 +138,15 @@ exports.generateTestSuite = (req, res, next) => {
   //! ............................................Hyper-Scout Bee phase..............................................................
   // check for better solutions in archive
   let isReplaced = false;
-  archive.forEach((testCase) => {
-    if (testCase.fitnessValue > fitnessValues[testCase.testCaseIndex]) {
-      currentPopulation[populationKeys[testCase.testCaseIndex]] =
-        structuredClone(testCase.testCase);
-      fitnessValues[testCase.testCaseIndex] = testCase.fitnessValue;
+
+  for (let i = 0; i < populationSize; i++) {
+    const archivedFitness = fitness(archive[i].testCase, archive[i].numbers);
+    if (archivedFitness > fitnessValues[i]) {
+      currentPopulation[populationKeys[i]] = structuredClone(archive[i]);
+      fitnessValues[i] = archivedFitness;
       isReplaced = true;
     }
-  });
+  }
 
   if (isReplaced) {
     sumFitnessValues.push(fitnessValues.reduce((prev, cur) => prev + cur, 0));
