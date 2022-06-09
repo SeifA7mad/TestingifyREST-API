@@ -151,7 +151,7 @@ exports.generateTestSuite = (req, res, next) => {
   }
 
   if (isReplaced) {
-    sumFitnessValues.push(fitnessValues.reduce((prev, cur) => prev + cur, 0));
+    sumFitnessValues[sumFitnessValues.length - 1] = fitnessValues.reduce((prev, cur) => prev + cur, 0);
   }
   //! ....................................................END........................................................................
 
