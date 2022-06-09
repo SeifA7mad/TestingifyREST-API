@@ -5,5 +5,6 @@ exports.postTestApi = (req, res, next) => {
     routes: Object.keys(req.testSuite),
     fitnessValues: req.fitnessValues,
     sumFitnessValues: req.sumFitnessValues,
+    abcFitnessValues: req.abcFitnessValues,
   });
 };

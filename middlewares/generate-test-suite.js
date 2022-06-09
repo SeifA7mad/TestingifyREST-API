@@ -135,6 +135,8 @@ exports.generateTestSuite = (req, res, next) => {
     }
   }
 
+  const abcFitnessValues = [...sumFitnessValues];
+
   //! ............................................Hyper-Scout Bee phase..............................................................
   // check for better solutions in archive
   let isReplaced = false;
@@ -151,7 +153,7 @@ exports.generateTestSuite = (req, res, next) => {
   if (isReplaced) {
     sumFitnessValues.push(fitnessValues.reduce((prev, cur) => prev + cur, 0));
   }
-  //! ....................................................END...................................................................
+  //! ....................................................END........................................................................
 
   // console.log('POPULATION AFTER ALGO.');
   // console.log(currentPopulation);
@@ -159,5 +161,6 @@ exports.generateTestSuite = (req, res, next) => {
   req.testSuite = currentPopulation;
   req.fitnessValues = fitnessValues;
   req.sumFitnessValues = sumFitnessValues;
+  req.abcFitnessValues = abcFitnessValues;
   next();
 };
