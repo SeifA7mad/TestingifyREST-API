@@ -53,7 +53,7 @@ const executeTestCase = async (
 };
 
 exports.executeTestSuite = async (req, res, next) => {
-  const testSuite = req.testSuite;
+  const testSuite = req.DABC_results.testSuite;
   const generalRequiredSecurity = req.requiredGeneralSecurity;
   const testingSuiteResults = {};
 
