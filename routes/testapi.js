@@ -7,14 +7,27 @@ const analyseOas = require('../middlewares/analyse-oas');
 const generateTestSuits = require('../middlewares/generate-test-suite');
 const executeTestSuite = require('../middlewares/execute-test-suite');
 
+const testingExecutionMiddlewares = [
+  validateSaveOas.saveOasToFile,
+  validateSaveOas.validateAccessToApi,
+  analyseOas.transformRoutes,
+  generateTestSuits.generateTestSuite,
+  executeTestSuite.executeTestSuite,
+];
+
 const testingMiddlewares = [
   validateSaveOas.saveOasToFile,
   validateSaveOas.validateAccessToApi,
   analyseOas.transformRoutes,
   generateTestSuits.generateTestSuite,
-  //! Send Algo. results without executing test cases
-  //executeTestSuite.executeTestSuite,
 ];
+
+
+router.post(
+  '/testapi-execute',
+  testingExecutionMiddlewares,
+  testapiController.postTestApi
+);
 
 router.post('/testapi', testingMiddlewares, testapiController.postTestApi);
 
