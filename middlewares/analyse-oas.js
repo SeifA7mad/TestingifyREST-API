@@ -134,7 +134,7 @@ exports.transformRoutes = async (req, res, next) => {
   const routesMap = {};
 
   try {
-    const oas = await SwaggerParser.dereference(req.workingFilePath);
+    const oas = await SwaggerParser.dereference(req.file.path);
     const oasPaths = oas.paths;
 
     // later: work on file streams (chunks) instead of looping on whole file

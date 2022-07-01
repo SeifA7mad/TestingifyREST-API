@@ -8,7 +8,6 @@ const generateTestSuits = require('../middlewares/generate-test-suite');
 const executeTestSuite = require('../middlewares/execute-test-suite');
 
 const testingExecutionMiddlewares = [
-  validateSaveOas.saveOasToFile,
   validateSaveOas.validateAccessToApi,
   analyseOas.transformRoutes,
   generateTestSuits.generateTestSuite,
@@ -16,12 +15,10 @@ const testingExecutionMiddlewares = [
 ];
 
 const testingMiddlewares = [
-  validateSaveOas.saveOasToFile,
   validateSaveOas.validateAccessToApi,
   analyseOas.transformRoutes,
   generateTestSuits.generateTestSuite,
 ];
-
 
 router.post(
   '/testapi-execute',

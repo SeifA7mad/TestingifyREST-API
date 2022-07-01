@@ -2,26 +2,26 @@ const fs = require('fs');
 const path = require('path');
 const SwaggerParser = require('@apidevtools/swagger-parser');
 
-exports.saveOasToFile = (req, res, next) => {
-  // if (!req.file) {
-  //   console.log(req.body);
-  //   const dir = path.join(process.cwd(), `/data/${req.file.originalname}`);
-  //   try {
-  //     fs.writeFileSync(dir, JSON.stringify(req.body));
-  //     req.workingFilePath = dir;
-  //   } catch (err) {
-  //     next(err);
-  //   }
-  // } else {
-  //   req.workingFilePath = req.file.path;
-  // }
+// exports.saveOasToFile = (req, res, next) => {
+//   // if (!req.file) {
+//   //   console.log(req.body);
+//   //   const dir = path.join(process.cwd(), `/data/${req.file.originalname}`);
+//   //   try {
+//   //     fs.writeFileSync(dir, JSON.stringify(req.body));
+//   //     req.workingFilePath = dir;
+//   //   } catch (err) {
+//   //     next(err);
+//   //   }
+//   // } else {
+//   //   req.workingFilePath = req.file.path;
+//   // }
 
-  // console.log(req.file);
+//   // console.log(req.file);
 
-  req.workingFilePath = req.file.path;
-  console.log('File SAVED!');
-  next();
-};
+//   req.workingFilePath = req.file.path;
+//   console.log('File SAVED!');
+//   next();
+// };
 
 exports.validateAccessToApi = async (req, res, next) => {
   const authorizationProtocol = {
@@ -44,7 +44,7 @@ exports.validateAccessToApi = async (req, res, next) => {
     // OpenID: {},
   };
   try {
-    const oas = await SwaggerParser.bundle(req.workingFilePath);
+    const oas = await SwaggerParser.bundle(req.file.path);
 
     //loop on each server to catch an working one
     // oas.servers.forEach(async (server) => {
