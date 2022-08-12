@@ -9,7 +9,7 @@
  ## How it works
   1. The user provide the OpenAPI Specefication for the API (SUT) he/she want to test and provide all the required security keys. 
   2. TestingifyREST analyse the provided OAS and start to generate Test Cases for the API using an Enhanced version from the evolutionairy algorithm ABC.
-  3. TestingifyREST execute each Test Case against the API (SUT) to check if the Test Case is passed or not.
+  3. TestingifyREST execute each Test Case against the API (SUT) to check if the Test Case passed or not.
   4. TestingifyREST send back to the user a complete Log that includes the complete Test Suite and A complete detailed results for each Test Case execution.
   
  ### How to contribute
