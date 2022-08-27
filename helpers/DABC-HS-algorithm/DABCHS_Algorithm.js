@@ -34,6 +34,7 @@ const DABCHS_algo = (routes, useModified) => {
 
   const archive = new Array(populationSize);
   const sumFitnessValues = [];
+  let foundBestSolution = false;
   //! ....................................................END....................................................................
 
   for (let fe = 0; fe < mfe; fe++) {
@@ -136,11 +137,12 @@ const DABCHS_algo = (routes, useModified) => {
     //! ....................................................END...................................................................
     sumFitnessValues.push(fitnessValues.reduce((prev, cur) => prev + cur, 0));
     if (sumFitnessValues[sumFitnessValues.length - 1] >= mfv) {
+      foundBestSolution = true;
       break;
     }
   }
 
-  if (useModified) {
+  if (useModified && !foundBestSolution) {
     //! ............................................Hyper-Scout Bee phase..............................................................
     // check for better solutions in archive
     let isReplaced = false;
