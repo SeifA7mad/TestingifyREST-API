@@ -1,10 +1,10 @@
-const DABCHS_algo = require("../helpers/DABC-HS-algorithm/DABCHS_Algorithm");
+const AABC_algo = require('../helpers/A-ABC-algorithm/AABC_Algorithm');
 
 
 exports.generateTestSuite = (req, res, next) => {
 
-  const DABC_results = DABCHS_algo(req.routes, true);
-  const ABC_results = DABCHS_algo(req.routes, false);
+  const DABC_results = AABC_algo(req.routes, true);
+  const ABC_results = AABC_algo(req.routes, false);
 
   req.DABC_results = DABC_results;
   req.ABC_results = ABC_results;

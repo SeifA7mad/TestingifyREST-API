@@ -16,7 +16,7 @@ const calculateProbabilities = (fitnessValues, maxFit) => {
   return probabilities;
 };
 
-const DABCHS_algo = (routes, useModified) => {
+const AABC_algo = (routes, useModified) => {
   //! ............................................Initialization Phase..........................................................
   const populationSize = Object.keys(routes).length;
   const trials = new Array(populationSize).fill(0);
@@ -24,7 +24,7 @@ const DABCHS_algo = (routes, useModified) => {
   // maximum number of fitness evaluations
   const mfe = 100;
   // maximum value of fitness function
-  const mfv = populationSize * 3.5;
+  const mfv = populationSize * 3.3;
   // The maximum number of the trials to determine exhausted sources -> Np x D
   const limit = populationSize * 5;
   // first population => currentPopulation
@@ -172,4 +172,4 @@ const DABCHS_algo = (routes, useModified) => {
   };
 };
 
-module.exports = DABCHS_algo;
+module.exports = AABC_algo;
