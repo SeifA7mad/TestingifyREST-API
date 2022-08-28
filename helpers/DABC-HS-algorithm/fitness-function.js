@@ -21,7 +21,7 @@ exports.fitness = (testCase, numbers) => {
 
   // check Inputs value Coverage
   // by: dividing number of distinct finite values(boolean|enums) used in testcase / total expected finite values
-  let inputValueCoverage = 0;
+  let inputValueCoverage = 1;
   if (numbers.totalNumberOfFiniteValues != 0) {
     const finiteInputs = [];
     // filter from parametrs&properties the finite values only
