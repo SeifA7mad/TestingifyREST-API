@@ -18,28 +18,29 @@ const calculateProbabilities = (fitnessValues, maxFit) => {
 
 const AABC_algo = (routes, useModified) => {
   //! ............................................Initialization Phase..........................................................
-  const populationSize = Object.keys(routes).length;
-  const trials = new Array(populationSize).fill(0);
-  const fitnessValues = new Array(populationSize);
+  // Np -> Population Size
+  const Np = Object.keys(routes).length;
+  const trials = new Array(Np).fill(0);
+  const fitnessValues = new Array(Np);
   // maximum number of fitness evaluations
   const mfe = 100;
   // maximum value of fitness function
-  const mfv = populationSize * 3.3;
+  const mfv = Np * 3.3;
   // The maximum number of the trials to determine exhausted sources -> Np x D
-  const limit = populationSize * 5;
+  const limit = Np * 5;
   // first population => currentPopulation
   const currentPopulation = initializeFoodSources(routes);
   const populationKeys = Object.keys(currentPopulation);
   const routesKeys = Object.keys(routes);
 
-  const archive = new Array(populationSize);
+  const archive = new Array(Np);
   const sumFitnessValues = [];
   let foundBestSolution = false;
   //! ....................................................END....................................................................
 
   for (let fe = 0; fe < mfe; fe++) {
     //! ............................................Employed Bee phase...........................................................
-    for (let i = 0; i < populationSize; i++) {
+    for (let i = 0; i < Np; i++) {
       const testCase = currentPopulation[populationKeys[i]]['testCase'];
       const numbers = currentPopulation[populationKeys[i]]['numbers'];
 
@@ -62,7 +63,7 @@ const AABC_algo = (routes, useModified) => {
 
     //! ............................................Onlooker Bee phase...........................................................
     const prob = calculateProbabilities(fitnessValues, mfv);
-    for (let i = 0, k = 0; k < populationSize; i = ++i % populationSize) {
+    for (let i = 0, k = 0; k < Np; i = ++i % Np) {
       if (Math.random() > prob[i]) {
         continue;
       }
@@ -147,7 +148,7 @@ const AABC_algo = (routes, useModified) => {
     // check for better solutions in archive
     let isReplaced = false;
 
-    for (let i = 0; i < populationSize; i++) {
+    for (let i = 0; i < Np; i++) {
       const archivedFitness = fitness(archive[i].testCase, archive[i].numbers);
       if (archivedFitness > fitnessValues[i]) {
         currentPopulation[populationKeys[i]] = structuredClone(archive[i]);

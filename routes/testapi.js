@@ -15,7 +15,6 @@ const testingExecutionMiddlewares = [
 ];
 
 const testingMiddlewares = [
-  validateSaveOas.validateAccessToApi,
   analyseOas.transformRoutes,
   generateTestSuits.generateTestSuite,
 ];
