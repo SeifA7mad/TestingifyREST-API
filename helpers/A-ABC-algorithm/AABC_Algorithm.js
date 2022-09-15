@@ -25,7 +25,7 @@ const AABC_algo = (routes, useModified) => {
   // maximum number of fitness evaluations
   const mfe = 100;
   // maximum value of fitness function
-  const mfv = Np * 3.3;
+  const mfv = Np * 3.5;
   // The maximum number of the trials to determine exhausted sources -> Np x D
   const limit = Np * 5;
   // first population => currentPopulation
