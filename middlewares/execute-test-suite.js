@@ -9,47 +9,51 @@ const executeTestCase = async (
   operation,
   security
 ) => {
-  let reqURL = requestURL;
-  const URLTemplate = parse(reqURL);
+  try {
+    let reqURL = requestURL;
+    const URLTemplate = parse(reqURL);
 
-  const paramsObj = {};
-  testInputs.params.forEach((param) => {
-    paramsObj[param.name] = param.value;
-  });
-  reqURL = URLTemplate.expand(paramsObj);
-
-  let propsObj = null;
-  if (testInputs.props.length > 0) {
-    propsObj = {};
-    testInputs.props.forEach((prop) => {
-      propsObj[prop.name] = prop.value;
+    const paramsObj = {};
+    testInputs.params.forEach((param) => {
+      paramsObj[param.name] = param.value;
     });
+    reqURL = URLTemplate.expand(paramsObj);
+
+    let propsObj = null;
+    if (testInputs.props.length > 0) {
+      propsObj = {};
+      testInputs.props.forEach((prop) => {
+        propsObj[prop.name] = prop.value;
+      });
+    }
+
+    let apikey = '';
+    const securityHeaders = {};
+    security.forEach((key) => {
+      if (key.in === 'query') {
+        apikey = reqURL.includes('?')
+          ? `&${key.name}=${key.value}`
+          : `?${key.name}=${key.value}`;
+      }
+      if (key.in === 'header') {
+        securityHeaders[key.name] = `${key.prefix}${key.value}`;
+      }
+      if (key.in === 'cookie') {
+        securityHeaders['Cookie'] = `${key.name}=${key.value}`;
+      }
+    });
+
+    const reqConfig = {
+      method: operation,
+      url: `${serverURL.slice(0, -1)}${reqURL}${apikey}`,
+      data: propsObj ? propsObj : null,
+      headers: securityHeaders
+    };
+
+    return axios(reqConfig);
+  } catch (err) {
+    throw err;
   }
-
-  let apikey = '';
-  const securityHeaders = {};
-  security.forEach((key) => {
-    if (key.in === 'query') {
-      apikey = reqURL.includes('?')
-        ? `&${key.name}=${key.value}`
-        : `?${key.name}=${key.value}`;
-    }
-    if (key.in === 'header') {
-      securityHeaders[key.name] = `${key.prefix}${key.value}`;
-    }
-    if (key.in === 'cookie') {
-      securityHeaders['Cookie'] = `${key.name}=${key.value}`;
-    }
-  });
-
-  const reqConfig = {
-    method: operation,
-    url: `${serverURL.slice(0, -1)}${reqURL}${apikey}`,
-    data: propsObj ? propsObj : null,
-    headers: securityHeaders,
-  };
-
-  return await axios(reqConfig);
 };
 
 exports.executeTestSuite = async (req, res, next) => {
@@ -87,6 +91,7 @@ exports.executeTestSuite = async (req, res, next) => {
           op,
           security
         );
+
         testingSuiteResults[testSuiteRoute].push(
           new TestResult(
             op,
@@ -100,6 +105,11 @@ exports.executeTestSuite = async (req, res, next) => {
           )
         );
       } catch (err) {
+        console.error(
+          '🚀 ~ file: execute-test-suite.js:108 ~ exports.executeTestSuite= ~ err:',
+          err
+        );
+
         if (err.response) {
           testingSuiteResults[testSuiteRoute].push(
             new TestResult(

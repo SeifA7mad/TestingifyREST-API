@@ -31,7 +31,7 @@ const generateNominalValue = (typeSchema) => {
       typeSchema.enum
         ? typeSchema.enum[generateRandomInt(typeSchema.enum.length - 1)]
         : undefined,
-      typeSchema.items ? [generateNominalValue(typeSchema.items)] : undefined,
+      typeSchema.items ? [generateNominalValue(typeSchema.items)] : undefined
     ];
     return values.find((value) => value !== undefined);
   }
@@ -70,9 +70,7 @@ const generateMutatedValue = (typeSchema) => {
 
 const generateViolationValue = (typeSchema) => {
   if (typeSchema.type === 'string') {
-    return crypto
-      .randomBytes(typeSchema.maxLength + Math.pow(2, typeSchema.maxLength))
-      .toString('hex');
+    return crypto.randomBytes(typeSchema.maxLength + 1).toString('hex');
   }
 
   if (typeSchema.type === 'number' || typeSchema.type === 'integer') {
@@ -129,7 +127,7 @@ const extractFitnessTotalNumbers = (routeObj) => {
   return {
     totalNumberOfOperations,
     totalNumberOfInputs,
-    totalNumberOfFiniteValues,
+    totalNumberOfFiniteValues
   };
 };
 
@@ -140,5 +138,5 @@ module.exports = {
   extractNumberOfPossiableValues,
   generateViolationValue,
   isFinite,
-  extractFitnessTotalNumbers,
+  extractFitnessTotalNumbers
 };
